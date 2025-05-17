@@ -1,30 +1,20 @@
-import mongoose from "mongoose";
+import mongoose, { ConnectOptions } from "mongoose";
 
 const MONGODB_URI = process.env.MONGODB_URI;
+const clientOptions = { serverApi: { version: "1", strict: true, deprecationErrors: true }, dbName: "test" };
 
-function makeConnection(handler: (connection: mongoose.Connection) => void) {
+async function makeConnection<t>(handler: (connection: mongoose.Connection) => Promise<t>) {
     if (!MONGODB_URI) {
         throw new Error("MONGODB_URI is not defined");
     }
 
-    // TO-DO: come up with a name for the database
-    mongoose.connect(MONGODB_URI, { dbName: "" });
-
-    const connection = mongoose.connection;
-
-    connection.on("error", (err) => {
-        console.error("MongoDB connection error:", err);
-    });
-
-    connection.on("disconnected", () => {
-        console.log("MongoDB disconnected");
-    });
-
-    connection.once("open", () => {
-        console.log("MongoDB connected");
-        handler(connection);
-        connection.close();
-    });
+    try {
+        await mongoose.connect(MONGODB_URI, clientOptions as ConnectOptions);
+    } finally {
+        const result = await handler(mongoose.connection);
+        await mongoose.disconnect();
+        return result;
+    }
 }
 
 export default makeConnection;
