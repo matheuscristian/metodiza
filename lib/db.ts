@@ -8,13 +8,16 @@ async function makeConnection<t>(handler: (connection: mongoose.Connection) => P
         throw new Error("MONGODB_URI is not defined");
     }
 
+    let result;
+
     try {
         await mongoose.connect(MONGODB_URI, clientOptions as ConnectOptions);
+        result = await handler(mongoose.connection);
     } finally {
-        const result = await handler(mongoose.connection);
         await mongoose.disconnect();
-        return result;
     }
+
+    return result;
 }
 
 export default makeConnection;

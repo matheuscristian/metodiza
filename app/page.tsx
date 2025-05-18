@@ -13,24 +13,17 @@ import { Button } from "@/components/ui/button";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import { z } from "zod";
 import { createPerson } from "./actions";
-
-const schema = z.object({
-    name: z.string().min(1, { message: "Nome é obrigatório!" }),
-    age: z.coerce.number().min(1, { message: "Idade é obrigatória!" }),
-    address: z.object({
-        street: z.string().min(1, { message: "Rua é obrigatória!" }),
-        city: z.string().min(1, { message: "Cidade é obrigatória!" }),
-        state: z.string().min(1, { message: "Estado é obrigatório!" }),
-    }),
-});
+import { useState } from "react";
+import { Person } from "@/model/person";
 
 export default function Home() {
-    const form = useForm<z.infer<typeof schema>>({
-        resolver: zodResolver(schema),
+    const [openSuccessDialog, setOpenSuccessDialog] = useState(false);
+    const [openErrorDialog, setOpenErrorDialog] = useState(false);
+    const [openLoadingDialog, setOpenLoadingDialog] = useState(false);
+
+    const form = useForm<Person>({
         defaultValues: {
             name: "",
             age: "" as unknown as number,
@@ -42,9 +35,20 @@ export default function Home() {
         },
     });
 
-    function onSubmit(data: z.infer<typeof schema>) {
-        createPerson(data);
-    }
+    const onSubmit = async (data: Person) => {
+        setOpenLoadingDialog(true);
+        const res = await createPerson(data);
+        setOpenLoadingDialog(false);
+        if (res === null) {
+            setOpenErrorDialog(true);
+        } else if (typeof res === "object") {
+            for (const value of res) {
+                form.setError(value.path as keyof Person, value);
+            }
+        } else {
+            setOpenSuccessDialog(true);
+        }
+    };
 
     return (
         <Form {...form}>
@@ -123,11 +127,38 @@ export default function Home() {
                     </Button>
                 </div>
             </form>
-            <AlertDialog open={form.formState.isSubmitSuccessful} onOpenChange={() => form.reset()}>
+            <AlertDialog open={openLoadingDialog}>
+                <AlertDialogContent>
+                    <AlertDialogHeader>
+                        <AlertDialogTitle>Carregando...</AlertDialogTitle>
+                        <AlertDialogDescription>Seus dados estão sendo enviados.</AlertDialogDescription>
+                    </AlertDialogHeader>
+                </AlertDialogContent>
+            </AlertDialog>
+            <AlertDialog
+                open={openSuccessDialog}
+                onOpenChange={() => {
+                    form.reset();
+                    setOpenSuccessDialog(false);
+                }}
+            >
                 <AlertDialogContent>
                     <AlertDialogHeader>
                         <AlertDialogTitle>Sucesso!</AlertDialogTitle>
                         <AlertDialogDescription>Seus dados foram enviados com sucesso!</AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                        <AlertDialogAction>Ok</AlertDialogAction>
+                    </AlertDialogFooter>
+                </AlertDialogContent>
+            </AlertDialog>
+            <AlertDialog open={openErrorDialog} onOpenChange={() => setOpenErrorDialog(false)}>
+                <AlertDialogContent>
+                    <AlertDialogHeader>
+                        <AlertDialogTitle>Erro</AlertDialogTitle>
+                        <AlertDialogDescription>
+                            Ocorreu um erro no servidor. Não foi possível enviar seus dados!
+                        </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>
                         <AlertDialogAction>Ok</AlertDialogAction>
