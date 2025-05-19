@@ -1,4 +1,4 @@
-<p align="center" style="font-size: 3em;">Noteflow</p>
+<p align="center"><font size="10">Noteflow</font></p>
 
 <p align="center"> <small><i>Inserir Slogan</i></small> </p>
 
