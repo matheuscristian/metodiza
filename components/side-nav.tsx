@@ -28,7 +28,7 @@ export default function SideNav() {
 
             <ul className="flex flex-col space-y-2">
                 {navDestinations.map((item) => {
-                    const isActive = item.path === pathName;
+                    const isActive = pathName.includes(item.path);
                     return (
                         <li key={item.path}>
                             <Tooltip disableHoverableContent delayDuration={0}>
