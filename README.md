@@ -1,4 +1,8 @@
-<p align="center"><font size="10">Noteflow</font></p>
+<!-- <p align="center"><font size="10">METODIZA</font></p> -->
+
+<p align="center">
+<img src="public/logo.svg" width="20%" />
+</p>
 
 <p align="center"> <small><i>Inserir Slogan</i></small> </p>
 
@@ -17,8 +21,8 @@
 1. Clone o repositório:
 
 ```sh
-git clone https://github.com/matheuscristian/noteflow.git
-cd noteflow
+git clone https://github.com/matheuscristian/metodiza.git
+cd metodiza
 ```
 
 2. Instale as dependências:
