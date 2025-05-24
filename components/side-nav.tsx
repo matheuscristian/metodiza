@@ -9,14 +9,14 @@ import { usePathname } from "next/navigation";
 
 export default function SideNav() {
     const navDestinations = [
-        { icon: "/notes.svg", path: "notes", label: "Notas" },
-        { icon: "/agenda.svg", path: "agenda", label: "Agenda" },
-        { icon: "/graph.svg", path: "graph", label: "Grafo" },
-        { icon: "/brainstorm.svg", path: "brainstorm", label: "Brainstorm" },
-        { icon: "/pomodoro.svg", path: "pomodoro", label: "Pomodoro Timer" },
+        { icon: "/notes.svg", path: "/app/notes", label: "Notas" },
+        { icon: "/agenda.svg", path: "/app/agenda", label: "Agenda" },
+        { icon: "/graph.svg", path: "/app/graph", label: "Grafo" },
+        { icon: "/brainstorm.svg", path: "/app/brainstorm", label: "Brainstorm" },
+        { icon: "/pomodoro.svg", path: "/app/pomodoro", label: "Pomodoro Timer" },
     ];
 
-    const pathName = usePathname().split("/").pop();
+    const pathName = usePathname();
 
     return (
         <nav className="flex h-screen w-16 flex-col items-center border-r border-black/25 bg-[var(--bg-2)] py-4">
