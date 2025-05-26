@@ -1,97 +1,72 @@
 "use server";
 
 import makeConnection from "@/lib/db";
-import person, { Person } from "@/model/person";
-import { z } from "zod";
+import treeEntry, { TreeEntry } from "@/model/tree-entry";
 
-function flattenErrorKeys<t, U>(
-    errors: z.ZodFormattedError<t, U>,
-    prefix = ""
-): Array<{ path: string; message: string }> {
-    return Object.keys(errors).flatMap((key) => {
-        if (key === "_errors") {
-            return [];
-        }
-        const path = prefix ? `${prefix}.${key}` : key;
-        const errorValue = (errors as Record<string, unknown>)[key];
-        if (typeof errorValue === "object" && errorValue !== null && Object.keys(errorValue).length > 1) {
-            return flattenErrorKeys(errorValue as z.ZodFormattedError<t, U>, path);
-        } else {
-            return { path, message: (errorValue as never)["_errors"][0] };
-        }
-    });
-}
-
-const personSchema = z.object({
-    name: z.string().min(1, { message: "Nome é obrigatório!" }),
-    age: z.coerce.number().min(1, { message: "Idade é obrigatória!" }),
-    address: z.object({
-        street: z.string().min(1, { message: "Rua é obrigatória!" }),
-        city: z.string().min(1, { message: "Cidade é obrigatória!" }),
-        state: z.string().min(1, { message: "Estado é obrigatório!" }),
-    }),
-});
-
-export async function createPerson(data: Person) {
-    const parseResult = personSchema.safeParse(data);
-    if (!parseResult.success) {
-        return flattenErrorKeys(parseResult.error.format());
-    }
-    try {
-        return (await makeConnection(async () => await person.create(data)))._id.toString();
-    } catch (error) {
-        console.error(error);
-        return null;
-    }
-}
-
-interface BaseTreeEntry {
+interface TreatedBaseTreeEntry {
     name: string;
     uuid: string;
 }
 
-interface TreeNote extends BaseTreeEntry {
+interface TreeNote extends TreatedBaseTreeEntry {
     type: "file";
 }
 
-interface TreeDirectory extends BaseTreeEntry {
+interface TreeDirectory extends TreatedBaseTreeEntry {
     type: "directory";
-    children: TreeEntry[]; // This can be only ID's in database and then populated
+    children: TreatedTreeEntry[]; // This can be only ID's in database and then populated
 }
 
-export type TreeEntry = TreeNote | TreeDirectory;
+export type TreatedTreeEntry = TreeNote | TreeDirectory;
 
 // TO-DO: make this retrieve data from the database
-export async function getNotesTree(): Promise<TreeEntry[]> {
-    return [
-        {
-            type: "directory",
-            name: "Abacate",
-            uuid: crypto.randomUUID(),
-            children: [
-                {
-                    type: "file",
-                    name: "Queijinho Mineiro",
-                    uuid: crypto.randomUUID(),
-                },
-                {
-                    type: "file",
-                    name: "Cafezinho",
-                    uuid: crypto.randomUUID(),
-                },
-                {
-                    type: "directory",
-                    name: "test",
-                    uuid: crypto.randomUUID(),
-                    children: [
-                        {
-                            type: "file",
-                            name: "Hello World",
-                            uuid: crypto.randomUUID(),
-                        },
-                    ],
-                },
-            ],
-        },
-    ];
+export async function getNotesTree(): Promise<TreatedTreeEntry[]> {
+    const documents = await makeConnection(async () => (await treeEntry.find({}).exec()) as TreeEntry[]);
+
+    const res: TreatedTreeEntry[] = [];
+
+    for (const document of documents) {
+        const path = document.path.split("/").filter((v) => v.trim() != "");
+        for (const directory of path) {
+            if ()
+        }
+    }
+
+    // return [
+    //     {
+    //         type: "directory",
+    //         name: "Abacate",
+    //         uuid: crypto.randomUUID(),
+    //         children: [
+    //             {
+    //                 type: "file",
+    //                 name: "Queijinho Mineiro",
+    //                 uuid: crypto.randomUUID(),
+    //             },
+    //             {
+    //                 type: "file",
+    //                 name: "Cafezinho",
+    //                 uuid: crypto.randomUUID(),
+    //             },
+    //             {
+    //                 type: "directory",
+    //                 name: "test",
+    //                 uuid: crypto.randomUUID(),
+    //                 children: [
+    //                     {
+    //                         type: "file",
+    //                         name: "Hello World",
+    //                         uuid: crypto.randomUUID(),
+    //                     },
+    //                 ],
+    //             },
+    //         ],
+    //     },
+    // ];
+}
+
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+export async function deleteNote(uuid: string): Promise<boolean> {
+    // To do
+    return true;
 }

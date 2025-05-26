@@ -1,49 +1,26 @@
 "use client";
 
-import { getNotesTree, TreeEntry } from "@/app/actions";
+import { deleteNote, getNotesTree, TreatedTreeEntry } from "@/app/actions";
 import { useEffect, useState } from "react";
 import { SidebarMenuButton, SidebarMenuItem, SidebarMenuSub, SidebarMenuSubButton } from "./ui/sidebar";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "./ui/collapsible";
-import { ChevronRight, File, Folder } from "lucide-react";
+import { ChevronRight, File, Folder, Trash2 } from "lucide-react";
 import { ContextMenu, ContextMenuContent, ContextMenuItem, ContextMenuTrigger } from "./ui/context-menu";
 import Link from "next/link";
 import { redirect, usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 
 export default function Tree() {
-    const [notesTree, setNotesTree] = useState<TreeEntry[] | null>(null);
+    const [notesTree, setNotesTree] = useState<TreatedTreeEntry[] | null>(null);
     const pathName = usePathname().split("/").pop() || "";
 
-    // This is temporary, this should send a DELETE request to the server
-    // and then fetch the result again or do this only if successful
-    function deleteEntry(uuid: string, _tree: TreeEntry[] | null = null) {
-        if (!notesTree) return;
-
-        const tree = _tree ? _tree : notesTree;
-
-        let found = false;
-        for (const entry of tree) {
-            if (entry.uuid === uuid) {
-                const newTree = tree.filter((v) => v.uuid !== uuid);
-
-                if (_tree) return newTree;
-
-                setNotesTree(newTree);
-                return;
+    function deleteEntry(uuid: string) {
+        deleteNote(uuid).then((successful) => {
+            if (successful) {
+                getNotesTree().then(setNotesTree);
+                if (pathName === uuid) redirect("/app/notes");
             }
-
-            if (entry.type === "directory") {
-                const res = deleteEntry(uuid, entry.children);
-                if (res) {
-                    found = true;
-                    entry.children = res;
-                }
-            }
-        }
-
-        if (found) setNotesTree([...notesTree]);
-
-        if (pathName === uuid) redirect("/app/notes");
+        });
     }
 
     useEffect(() => {
@@ -55,7 +32,7 @@ export default function Tree() {
     return makeTree(notesTree, deleteEntry, pathName);
 }
 
-function makeTree(notesTree: TreeEntry[], deleteEntry: (uuid: string) => void, pathName: string) {
+function makeTree(notesTree: TreatedTreeEntry[], deleteEntry: (uuid: string) => void, pathName: string) {
     return notesTree.map((entry) => {
         if (entry.type === "file") {
             return (
@@ -74,7 +51,7 @@ function makeTree(notesTree: TreeEntry[], deleteEntry: (uuid: string) => void, p
                     </ContextMenuTrigger>
                     <ContextMenuContent>
                         <ContextMenuItem className="hover:cursor-pointer" onClick={() => deleteEntry(entry.uuid)}>
-                            Delete
+                            <Trash2 />
                         </ContextMenuItem>
                     </ContextMenuContent>
                 </ContextMenu>
@@ -95,7 +72,7 @@ function makeTree(notesTree: TreeEntry[], deleteEntry: (uuid: string) => void, p
                         </ContextMenuTrigger>
                         <ContextMenuContent>
                             <ContextMenuItem className="hover:cursor-pointer" onClick={() => deleteEntry(entry.uuid)}>
-                                Delete
+                                <Trash2 />
                             </ContextMenuItem>
                         </ContextMenuContent>
                     </ContextMenu>
