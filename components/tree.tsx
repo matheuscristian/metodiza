@@ -1,50 +1,110 @@
 "use client";
 
-import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { SidebarMenuButton, SidebarMenuItem, SidebarMenuSub } from "./ui/sidebar";
+import { getNotesTree, TreeEntry } from "@/app/actions";
+import { useEffect, useState } from "react";
+import { SidebarMenuButton, SidebarMenuItem, SidebarMenuSub, SidebarMenuSubButton } from "./ui/sidebar";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "./ui/collapsible";
 import { ChevronRight, File, Folder } from "lucide-react";
+import { ContextMenu, ContextMenuContent, ContextMenuItem, ContextMenuTrigger } from "./ui/context-menu";
+import Link from "next/link";
+import { redirect, usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export default function Tree({ item, path }: { item: string | any[]; path: string }) {
-    const [name, ...items] = Array.isArray(item) ? item : [item];
+export default function Tree() {
+    const [notesTree, setNotesTree] = useState<TreeEntry[] | null>(null);
+    const pathName = usePathname().split("/").pop() || "";
 
-    path += name + "/";
-    const browserPath = decodeURIComponent(usePathname()) + "/";
+    // This is temporary, this should send a DELETE request to the server
+    // and then fetch the result again or do this only if successful
+    function deleteEntry(uuid: string, _tree: TreeEntry[] | null = null) {
+        if (!notesTree) return;
 
-    console.log(path, browserPath);
+        const tree = _tree ? _tree : notesTree;
 
-    if (!items.length) {
-        return (
-            <Link href={path}>
-                <SidebarMenuButton className={cn("hover:cursor-pointer", path === browserPath ? "bg-gray-600/20" : "")}>
-                    <File />
-                    {name}
-                </SidebarMenuButton>
-            </Link>
-        );
+        let found = false;
+        for (const entry of tree) {
+            if (entry.uuid === uuid) {
+                const newTree = tree.filter((v) => v.uuid !== uuid);
+
+                if (_tree) return newTree;
+
+                setNotesTree(newTree);
+                return;
+            }
+
+            if (entry.type === "directory") {
+                const res = deleteEntry(uuid, entry.children);
+                if (res) {
+                    found = true;
+                    entry.children = res;
+                }
+            }
+        }
+
+        if (found) setNotesTree([...notesTree]);
+
+        if (pathName === uuid) redirect("/app/notes");
     }
 
-    return (
-        <SidebarMenuItem>
-            <Collapsible className="group/collapsible [&[data-state=open]>button>svg:first-child]:rotate-90">
-                <CollapsibleTrigger asChild>
-                    <SidebarMenuButton className="hover:cursor-pointer">
-                        <ChevronRight className="transition-transform" />
-                        <Folder />
-                        {name}
-                    </SidebarMenuButton>
-                </CollapsibleTrigger>
-                <CollapsibleContent>
-                    <SidebarMenuSub>
-                        {items.map((subItem, index) => (
-                            <Tree key={index} item={subItem} path={path} />
-                        ))}
-                    </SidebarMenuSub>
-                </CollapsibleContent>
-            </Collapsible>
-        </SidebarMenuItem>
-    );
+    useEffect(() => {
+        getNotesTree().then(setNotesTree);
+    }, []);
+
+    if (!notesTree) return null;
+
+    return makeTree(notesTree, deleteEntry, pathName);
+}
+
+function makeTree(notesTree: TreeEntry[], deleteEntry: (uuid: string) => void, pathName: string) {
+    return notesTree.map((entry) => {
+        if (entry.type === "file") {
+            return (
+                <ContextMenu key={entry.uuid}>
+                    <ContextMenuTrigger>
+                        <Link href={`/app/notes/${entry.uuid}`}>
+                            <SidebarMenuButton
+                                className={cn(
+                                    "hover:cursor-pointer hover:bg-gray-600/50",
+                                    pathName === entry.uuid && "bg-gray-600/50"
+                                )}
+                            >
+                                <File /> {entry.name}
+                            </SidebarMenuButton>
+                        </Link>
+                    </ContextMenuTrigger>
+                    <ContextMenuContent>
+                        <ContextMenuItem className="hover:cursor-pointer" onClick={() => deleteEntry(entry.uuid)}>
+                            Delete
+                        </ContextMenuItem>
+                    </ContextMenuContent>
+                </ContextMenu>
+            );
+        }
+
+        return (
+            <SidebarMenuItem key={entry.uuid}>
+                <Collapsible>
+                    <ContextMenu>
+                        <ContextMenuTrigger>
+                            <CollapsibleTrigger asChild>
+                                <SidebarMenuSubButton className="group/trigger hover:cursor-pointer hover:bg-gray-600/50 select-none">
+                                    <ChevronRight className="transition-transform group-data-[state=open]/trigger:rotate-90" />
+                                    <Folder /> {entry.name}
+                                </SidebarMenuSubButton>
+                            </CollapsibleTrigger>
+                        </ContextMenuTrigger>
+                        <ContextMenuContent>
+                            <ContextMenuItem className="hover:cursor-pointer" onClick={() => deleteEntry(entry.uuid)}>
+                                Delete
+                            </ContextMenuItem>
+                        </ContextMenuContent>
+                    </ContextMenu>
+
+                    <CollapsibleContent>
+                        <SidebarMenuSub>{makeTree(entry.children, deleteEntry, pathName)}</SidebarMenuSub>
+                    </CollapsibleContent>
+                </Collapsible>
+            </SidebarMenuItem>
+        );
+    });
 }

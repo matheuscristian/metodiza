@@ -11,10 +11,6 @@ import {
     SidebarMenu,
 } from "@/components/ui/sidebar";
 
-const data = {
-    tree: [["Abacate", "Queijinho Mineiro", "Cafezinho"]],
-};
-
 export default function NotesLayout({ children }: { children: React.ReactNode }) {
     return (
         <SidebarProvider>
@@ -25,9 +21,7 @@ export default function NotesLayout({ children }: { children: React.ReactNode })
                             <SidebarGroupLabel>Notas</SidebarGroupLabel>
                             <SidebarGroupContent>
                                 <SidebarMenu>
-                                    {data.tree.map((item, index) => (
-                                        <Tree key={index} item={item} path="/app/notes/" />
-                                    ))}
+                                    <Tree />
                                 </SidebarMenu>
                             </SidebarGroupContent>
                         </SidebarGroup>

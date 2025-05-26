@@ -44,3 +44,54 @@ export async function createPerson(data: Person) {
         return null;
     }
 }
+
+interface BaseTreeEntry {
+    name: string;
+    uuid: string;
+}
+
+interface TreeNote extends BaseTreeEntry {
+    type: "file";
+}
+
+interface TreeDirectory extends BaseTreeEntry {
+    type: "directory";
+    children: TreeEntry[]; // This can be only ID's in database and then populated
+}
+
+export type TreeEntry = TreeNote | TreeDirectory;
+
+// TO-DO: make this retrieve data from the database
+export async function getNotesTree(): Promise<TreeEntry[]> {
+    return [
+        {
+            type: "directory",
+            name: "Abacate",
+            uuid: crypto.randomUUID(),
+            children: [
+                {
+                    type: "file",
+                    name: "Queijinho Mineiro",
+                    uuid: crypto.randomUUID(),
+                },
+                {
+                    type: "file",
+                    name: "Cafezinho",
+                    uuid: crypto.randomUUID(),
+                },
+                {
+                    type: "directory",
+                    name: "test",
+                    uuid: crypto.randomUUID(),
+                    children: [
+                        {
+                            type: "file",
+                            name: "Hello World",
+                            uuid: crypto.randomUUID(),
+                        },
+                    ],
+                },
+            ],
+        },
+    ];
+}
