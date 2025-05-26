@@ -1,4 +1,4 @@
-import Tree from "@/components/tree";
+import TreeDirectory from "@/components/tree";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 
@@ -21,7 +21,7 @@ export default function NotesLayout({ children }: { children: React.ReactNode })
                             <SidebarGroupLabel>Notas</SidebarGroupLabel>
                             <SidebarGroupContent>
                                 <SidebarMenu>
-                                    <Tree />
+                                    <TreeDirectory _directory={null} parentUpdate={null} />
                                 </SidebarMenu>
                             </SidebarGroupContent>
                         </SidebarGroup>
