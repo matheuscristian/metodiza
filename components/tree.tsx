@@ -2,6 +2,10 @@
 
 import { getNotesTree, TreeDirectory as TreeDirectoryT } from "@/app/actions";
 import { useEffect, useState } from "react";
+import { SidebarMenu, SidebarMenuButton, SidebarMenuSub } from "./ui/sidebar";
+import { Collapsible } from "@radix-ui/react-collapsible";
+import { CollapsibleContent, CollapsibleTrigger } from "./ui/collapsible";
+import { ChevronRight, File, Folder } from "lucide-react";
 
 export default function TreeDirectory({
     _directory,
@@ -14,10 +18,12 @@ export default function TreeDirectory({
 
     const root = _directory?.name == "root" || !_directory;
 
-    function updateDirectory() {
-    // target: string | undefined,
-    // action: "CREATE" | "DELETE" | "RELOAD",
-    // folder: boolean | undefined
+    function updateDirectory(
+        target: string | undefined,
+        action: "CREATE" | "DELETE" | "RELOAD",
+        folder: boolean | undefined
+    ) {
+        console.log(target, action, folder);
         setDirectory(directory && { ...directory });
     }
 
@@ -29,34 +35,66 @@ export default function TreeDirectory({
         getNotesTree().then(setDirectory);
     }, [root]);
 
-    return directory?.children.length ? (
-        <div>
-            {!root && (
-                <p
-                    onClick={function () {
-                        return parentUpdate && parentUpdate();
-                    }}
-                >
-                    dir: {directory?.name}
-                </p>
-            )}
-
-            {directory?.children.map((entry, index) => {
-                if (entry.type === "file")
-                    return (
-                        <div key={entry.uuid} onClick={() => updateDirectory(entry.uuid, "RELOAD", undefined)}>
-                            {entry.name}
-                        </div>
-                    );
-
+    if (root && directory?.children.length) {
+        return directory?.children.map((entry, index) => {
+            if (entry.type === "file")
                 return (
-                    <TreeDirectory
-                        _directory={entry}
-                        parentUpdate={() => updateDirectory(entry.path, "RELOAD", undefined)}
-                        key={index}
-                    />
+                    <SidebarMenuButton key={entry.uuid} onClick={() => updateDirectory(entry.uuid, "RELOAD", false)}>
+                        <File /> {entry.name}
+                    </SidebarMenuButton>
                 );
-            })}
-        </div>
+
+            return (
+                <TreeDirectory
+                    _directory={entry}
+                    parentUpdate={() => updateDirectory(entry.path, "RELOAD", true)}
+                    key={index}
+                />
+            );
+        });
+    }
+
+    return directory?.children.length ? (
+        <SidebarMenu>
+            <Collapsible defaultOpen={root}>
+                {!root && (
+                    <CollapsibleTrigger asChild>
+                        <SidebarMenuButton
+                            onClick={function () {
+                                return parentUpdate && parentUpdate();
+                            }}
+                            className="hover:cursor-pointer group/trigger"
+                        >
+                            <ChevronRight className="transition-transform group-data-[state=open]/trigger:rotate-90" />{" "}
+                            <Folder /> {directory?.name}
+                        </SidebarMenuButton>
+                    </CollapsibleTrigger>
+                )}
+                <CollapsibleContent>
+                    <SidebarMenuSub>
+                        {directory?.children.map((entry, index) => {
+                            if (entry.type === "file")
+                                return (
+                                    <SidebarMenuButton
+                                        key={entry.uuid}
+                                        onClick={() => updateDirectory(entry.uuid, "RELOAD", false)}
+                                        className="hover:cursor-pointer"
+                                    >
+                                        <File /> {entry.name}
+                                    </SidebarMenuButton>
+                                );
+
+                            return (
+                                <TreeDirectory
+                                    _directory={entry}
+                                    parentUpdate={() => updateDirectory(entry.path, "RELOAD", true)}
+                                    key={index}
+                                />
+                            );
+                        })}
+                    </SidebarMenuSub>
+                </CollapsibleContent>
+            </Collapsible>
+        </SidebarMenu>
     ) : null;
 }
