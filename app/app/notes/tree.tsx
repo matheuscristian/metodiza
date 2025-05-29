@@ -2,14 +2,15 @@
 
 import { getNotesTree, TreeDirectory as TreeDirectoryT } from "@/app/actions";
 import { useEffect, useState } from "react";
-import { SidebarMenu, SidebarMenuButton, SidebarMenuSub } from "./ui/sidebar";
+import { SidebarMenu, SidebarMenuButton, SidebarMenuSub } from "@/components/ui/sidebar";
 import { Collapsible } from "@radix-ui/react-collapsible";
-import { CollapsibleContent, CollapsibleTrigger } from "./ui/collapsible";
+import { CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { ChevronRight, File, Folder } from "lucide-react";
+import Link from "next/link";
 
 export default function TreeDirectory({
     _directory,
-    parentUpdate,
+    // parentUpdate,
 }: {
     _directory: TreeDirectoryT | null;
     parentUpdate: (() => void) | null;
@@ -27,7 +28,8 @@ export default function TreeDirectory({
         setDirectory(directory && { ...directory });
     }
 
-    if (root) parentUpdate = () => updateDirectory("root", "RELOAD", undefined);
+    // Will be used later
+    // if (root) parentUpdate = () => updateDirectory("root", "RELOAD", undefined);
 
     useEffect(() => {
         if (!root) return;
@@ -39,9 +41,11 @@ export default function TreeDirectory({
         return directory?.children.map((entry, index) => {
             if (entry.type === "file")
                 return (
-                    <SidebarMenuButton key={entry.uuid} onClick={() => updateDirectory(entry.uuid, "RELOAD", false)}>
-                        <File /> {entry.name}
-                    </SidebarMenuButton>
+                    <Link href={`/app/notes/${entry.uuid}`} key={entry.uuid}>
+                        <SidebarMenuButton>
+                            <File /> {entry.name}
+                        </SidebarMenuButton>
+                    </Link>
                 );
 
             return (
@@ -60,9 +64,9 @@ export default function TreeDirectory({
                 {!root && (
                     <CollapsibleTrigger asChild>
                         <SidebarMenuButton
-                            onClick={function () {
-                                return parentUpdate && parentUpdate();
-                            }}
+                            // onClick={function () {
+                            //     return parentUpdate && parentUpdate();
+                            // }}
                             className="hover:cursor-pointer group/trigger"
                         >
                             <ChevronRight className="transition-transform group-data-[state=open]/trigger:rotate-90" />{" "}
@@ -75,13 +79,14 @@ export default function TreeDirectory({
                         {directory?.children.map((entry, index) => {
                             if (entry.type === "file")
                                 return (
-                                    <SidebarMenuButton
-                                        key={entry.uuid}
-                                        onClick={() => updateDirectory(entry.uuid, "RELOAD", false)}
-                                        className="hover:cursor-pointer"
-                                    >
-                                        <File /> {entry.name}
-                                    </SidebarMenuButton>
+                                    <Link href={`/app/notes/${entry.uuid}`} key={entry.uuid}>
+                                        <SidebarMenuButton
+                                            // onClick={() => updateDirectory(entry.uuid, "RELOAD", false)}
+                                            className="hover:cursor-pointer"
+                                        >
+                                            <File /> {entry.name}
+                                        </SidebarMenuButton>
+                                    </Link>
                                 );
 
                             return (
