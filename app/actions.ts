@@ -1,7 +1,7 @@
 "use server";
 
 import makeConnection from "@/lib/db";
-import treeEntry, { TreeEntry } from "@/model/tree-entry";
+import treeEntry, { TreeEntry } from "@/model/tree-entry.model";
 
 export interface TreeDirectory {
     type: "directory";

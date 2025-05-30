@@ -1,5 +1,5 @@
 import makeConnection from "@/lib/db";
-import treeEntry, { TreeEntry } from "@/model/tree-entry";
+import treeEntry, { TreeEntry } from "@/model/tree-entry.model";
 import { randomUUID } from "crypto";
 
 export async function GET() {

@@ -1,5 +1,5 @@
 import makeConnection from "@/lib/db";
-import note, { Note } from "@/model/note";
+import note, { Note } from "@/model/note.model";
 import { redirect } from "next/navigation";
 
 export default async function Page({ params }: { params: Promise<{ uuid: string }> }) {
