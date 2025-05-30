@@ -41,7 +41,7 @@ export default function Tree({
         return directory?.children.map((entry, index) => {
             if (entry.type === "file")
                 return (
-                    <Link href={`/app/notes/${entry.uuid}/?name=${entry.name}`} key={entry.uuid}>
+                    <Link href={`/app/notes/?uuid=${entry.uuid}&name=${entry.name}`} key={entry.uuid}>
                         <SidebarMenuButton className="hover:cursor-pointer">
                             <File /> {entry.name}
                         </SidebarMenuButton>
@@ -75,7 +75,7 @@ export default function Tree({
                         {directory?.children.map((entry, index) => {
                             if (entry.type === "file")
                                 return (
-                                    <Link href={`/app/notes/${entry.uuid}/?name=${entry.name}`} key={entry.uuid}>
+                                    <Link href={`/app/notes/?uuid=${entry.uuid}&name=${entry.name}`} key={entry.uuid}>
                                         <SidebarMenuButton
                                             // onClick={() => updateDirectory(entry.uuid, "RELOAD", false)}
                                             className="hover:cursor-pointer"

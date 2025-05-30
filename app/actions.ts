@@ -1,7 +1,7 @@
 "use server";
 
 import makeConnection from "@/lib/db";
-import noteModel from "@/model/note.model";
+import noteModel, { Note } from "@/model/note.model";
 import treeEntry, { TreeEntry } from "@/model/tree-entry.model";
 
 export interface TreeDirectory {
@@ -67,6 +67,15 @@ export async function getNotesTree(): Promise<TreeDirectory> {
 
 export async function saveNote(content: string, uuid: string) {
     await makeConnection(async () => await noteModel.findOneAndUpdate({ uuid }, { content }).exec());
+}
+
+export async function getNoteContent(uuid:string) {
+    const noteEntry = await makeConnection(async () => (await noteModel.findOne({ uuid }).exec()) as Note | undefined);
+    if (!noteEntry) {
+        await makeConnection(async () => await noteModel.create({ uuid, content: "" }));
+        return "";
+    }
+    return noteEntry.content;
 }
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
