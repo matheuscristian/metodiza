@@ -1,4 +1,4 @@
-import Tree from "@/app/app/notes/tree";
+import Tree from "@/app/app/notes/components/tree";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 

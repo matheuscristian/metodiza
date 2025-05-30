@@ -1,5 +1,5 @@
 import { getNoteContent } from "@/app/actions";
-import TextArea from "./textarea";
+import TextArea from "./components/textarea";
 
 export default async function Page({
     searchParams,
