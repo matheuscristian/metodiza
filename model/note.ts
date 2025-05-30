@@ -6,7 +6,7 @@ export interface Note {
 }
 
 const note = new mongoose.Schema({
-    uuid: { type: String, required: true },
+    uuid: { type: String, required: true, unique: true },
     content: { type: String, required: true },
 });
 

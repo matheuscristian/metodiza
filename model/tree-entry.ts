@@ -1,16 +1,15 @@
 import mongoose from "mongoose";
 
 export interface TreeEntry {
-    name: string;
-    uuid: string;
+    // Marker will be used to mark a folder even if it doesn't contain any notes
+    name: string | "_marker_";
+    uuid: string | undefined;
     path: string;
 }
 
-export type NoteTree = Array<TreeEntry>;
-
 const treeEntry = new mongoose.Schema({
     name: { type: String, required: true },
-    uuid: { type: String, required: true },
+    uuid: { type: String, required: false },
     path: { type: String, required: true },
 });
 

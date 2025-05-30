@@ -1,58 +1,67 @@
 "use server";
 
-interface BaseTreeEntry {
-    name: string;
-}
+import makeConnection from "@/lib/db";
+import treeEntry, { TreeEntry } from "@/model/tree-entry";
 
-interface TreeNote extends BaseTreeEntry {
-    type: "file";
-    uuid: string;
-}
-
-export interface TreeDirectory extends BaseTreeEntry {
+export interface TreeDirectory {
     type: "directory";
+    name: string;
     path: string;
-    children: (TreeNote | TreeDirectory)[]; // This can be only ID's in database and then populated
+    children: Array<TreeDirectory | { type: "file"; name: string; uuid: string }>;
 }
 
-// TO-DO: make this retrieve data from the database
+function findPath(
+    _a: Array<TreeDirectory | { type: "file"; name: string; uuid: string }>,
+    path: string[],
+    fullPath: string
+) {
+    if (!path.length) {
+        return _a;
+    }
+
+    const pname = path.shift() || "";
+    const a = _a.find((v) => v.type === "directory" && v.name === pname);
+
+    if (!a) {
+        return findPath(
+            (
+                _a[
+                    _a.push({ type: "directory", name: pname, path: fullPath.split(pname)[0] + pname, children: [] }) -
+                        1
+                ] as TreeDirectory
+            ).children,
+            path,
+            fullPath
+        );
+    }
+
+    return findPath((a as TreeDirectory).children, path, fullPath);
+}
+
 export async function getNotesTree(): Promise<TreeDirectory> {
-    return {
+    const entries = (await makeConnection(async () => await treeEntry.find().exec())) as Array<TreeEntry>;
+
+    const root: TreeDirectory = {
         type: "directory",
         name: "root",
         path: "/",
-        children: [
-            {
-                type: "directory",
-                name: "Abacate",
-                path: "/abacate",
-                children: [
-                    {
-                        type: "file",
-                        name: "Queijinho Mineiro",
-                        uuid: crypto.randomUUID(),
-                    },
-                    {
-                        type: "file",
-                        name: "Cafezinho",
-                        uuid: crypto.randomUUID(),
-                    },
-                    {
-                        type: "directory",
-                        name: "test",
-                        path: "/abacate/test",
-                        children: [
-                            {
-                                type: "file",
-                                name: "Hello World",
-                                uuid: crypto.randomUUID(),
-                            },
-                        ],
-                    },
-                ],
-            },
-        ],
+        children: [],
     };
+
+    for (const entry of entries) {
+        const path = entry.path.split("/").filter((v) => v.trim().length);
+        const target = findPath(root.children, path, entry.path);
+
+        if (entry.name === "_marker_") continue;
+
+        target.push({
+            type: "file",
+            name: entry.name,
+            uuid: entry.uuid || "",
+        });
+    }
+
+    return root;
 }
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars

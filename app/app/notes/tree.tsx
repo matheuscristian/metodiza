@@ -1,6 +1,6 @@
 "use client";
 
-import { getNotesTree, TreeDirectory as TreeDirectoryT } from "@/app/actions";
+import { getNotesTree, TreeDirectory } from "@/app/actions";
 import { useEffect, useState } from "react";
 import { SidebarMenu, SidebarMenuButton, SidebarMenuSub } from "@/components/ui/sidebar";
 import { Collapsible } from "@radix-ui/react-collapsible";
@@ -8,14 +8,14 @@ import { CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsi
 import { ChevronRight, File, Folder } from "lucide-react";
 import Link from "next/link";
 
-export default function TreeDirectory({
+export default function Tree({
     _directory,
     // parentUpdate,
 }: {
-    _directory: TreeDirectoryT | null;
+    _directory: TreeDirectory | null;
     parentUpdate: (() => void) | null;
 }) {
-    const [directory, setDirectory] = useState<TreeDirectoryT | null>(_directory && { ..._directory });
+    const [directory, setDirectory] = useState<TreeDirectory | null>(_directory && { ..._directory });
 
     const root = _directory?.name == "root" || !_directory;
 
@@ -42,18 +42,14 @@ export default function TreeDirectory({
             if (entry.type === "file")
                 return (
                     <Link href={`/app/notes/${entry.uuid}`} key={entry.uuid}>
-                        <SidebarMenuButton>
+                        <SidebarMenuButton className="hover:cursor-pointer">
                             <File /> {entry.name}
                         </SidebarMenuButton>
                     </Link>
                 );
 
             return (
-                <TreeDirectory
-                    _directory={entry}
-                    parentUpdate={() => updateDirectory(entry.path, "RELOAD", true)}
-                    key={index}
-                />
+                <Tree _directory={entry} parentUpdate={() => updateDirectory(entry.path, "RELOAD", true)} key={index} />
             );
         });
     }
@@ -90,7 +86,7 @@ export default function TreeDirectory({
                                 );
 
                             return (
-                                <TreeDirectory
+                                <Tree
                                     _directory={entry}
                                     parentUpdate={() => updateDirectory(entry.path, "RELOAD", true)}
                                     key={index}
