@@ -1,18 +1,13 @@
-import { getNoteContent } from "@/app/actions";
-import TextArea from "./components/textarea";
-
 export default async function Page({
     searchParams,
 }: {
-    searchParams: Promise<{ uuid: string | null; name: string | null }>;
+    searchParams: Promise<{ id: string | null; }>;
 }) {
-    const { uuid, name } = await searchParams;
+    const { id } = await searchParams;
 
-    if (!uuid || !name) {
+    if (!id) {
         return null;
     }
 
-    const content = await getNoteContent(uuid);
-
-    return <TextArea content={content} uuid={uuid} name={name} />;
+    return  <h1>Hello, World</h1>
 }

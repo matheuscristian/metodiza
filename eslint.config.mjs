@@ -14,6 +14,7 @@ const eslintConfig = [
     {
         rules: {
             indent: ["error", 4],
+            noImplicityAny: false
         },
     },
 ];

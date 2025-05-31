@@ -1,40 +1,37 @@
-import makeConnection from "@/lib/db";
-import treeEntry, { TreeEntry } from "@/model/tree-entry.model";
-import { randomUUID } from "crypto";
+import connectToDatabase from "@/lib/db";
+import filesModel from "@/model/files.model";
 
 export async function GET() {
-    const entries: Array<TreeEntry> = [
-        {
-            name: "_marker_",
-            uuid: randomUUID(),
-            path: "/abacate",
-        },
-        {
-            name: "queijinho mineiro",
-            uuid: randomUUID(),
-            path: "/abacate",
-        },
-        {
-            name: "cafezinho",
-            uuid: randomUUID(),
-            path: "/",
-        },
-        {
-            name: "_marker_",
-            uuid: randomUUID(),
-            path: "/abacate/test",
-        },
-        {
-            name: "hello, world",
-            uuid: randomUUID(),
-            path: "/abacate/test",
-        },
-    ];
+    await connectToDatabase();
 
-    await makeConnection(async () => {
-        await treeEntry.deleteMany({}).exec();
-        await treeEntry.create(entries);
+    await filesModel.find({}).deleteMany().orFail();
+
+    const root = await filesModel.create({ name: "root", type: "folder", path: "/" });
+
+    const abacate = await filesModel.create({
+        name: "Abacate",
+        type: "folder",
+        parent: root.id,
+        path: "/Abacate/",
     });
 
-    return new Response("", { status: 200 });
+    await filesModel.create({
+        name: "Queijo Minas",
+        type: "file",
+        content: "Hummmmm",
+        parent: abacate.id,
+        path: "/Abacate/Queijo Minas",
+    });
+
+    await filesModel.create({
+        name: "Cafezinho",
+        type: "file",
+        content: "adoro",
+        parent: root.id,
+        path: "/Cafezinho",
+    });
+
+    return new Response(JSON.stringify(await filesModel.find({}).orFail()), {
+        headers: { "Content-Type": "application/json" },
+    });
 }

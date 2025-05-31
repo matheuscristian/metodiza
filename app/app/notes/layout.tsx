@@ -1,36 +1,26 @@
-import Tree from "@/app/app/notes/components/tree";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
-
 import {
     Sidebar,
+    SidebarProvider,
     SidebarContent,
     SidebarGroup,
-    SidebarGroupContent,
     SidebarGroupLabel,
-    SidebarMenu,
+    SidebarGroupContent,
 } from "@/components/ui/sidebar";
+import Explorer from "./explorer";
 
 export default function NotesLayout({ children }: { children: React.ReactNode }) {
     return (
         <SidebarProvider>
-            <ScrollArea className="max-h-screen" type="scroll">
-                <Sidebar collapsible="none">
-                    <SidebarContent className="min-h-screen">
-                        <SidebarGroup>
-                            <SidebarGroupLabel>Notas</SidebarGroupLabel>
-                            <SidebarGroupContent>
-                                <SidebarMenu>
-                                    <Tree _directory={null} parentUpdate={null} />
-                                </SidebarMenu>
-                            </SidebarGroupContent>
-                        </SidebarGroup>
-                    </SidebarContent>
-                </Sidebar>
-            </ScrollArea>
-            <ScrollArea className="max-h-screen w-full">
-                <SidebarInset className="px-20 py-10">{children}</SidebarInset>
-            </ScrollArea>
+            <Sidebar collapsible="none" className="h-screen">
+                <SidebarContent>
+                    <SidebarGroup>
+                        <SidebarGroupLabel>Notas</SidebarGroupLabel>
+                        <SidebarGroupContent>
+                            <Explorer path="/" />
+                        </SidebarGroupContent>
+                    </SidebarGroup>
+                </SidebarContent>
+            </Sidebar>
         </SidebarProvider>
     );
 }
