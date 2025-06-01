@@ -1,23 +1,27 @@
 import mongoose, { ConnectOptions } from "mongoose";
 
-const MONGODB_URI = process.env.MONGODB_URI;
-const clientOptions = { serverApi: { version: "1", strict: true, deprecationErrors: true }, dbName: "test" };
+const MONGODB_URI = process.env.MONGODB_URI!;
+const clientOptions: ConnectOptions = {
+    serverApi: { version: "1", strict: true, deprecationErrors: true },
+    dbName: "metodiza",
+};
 
-async function makeConnection<t>(handler: (connection: mongoose.Connection) => Promise<t>) {
-    if (!MONGODB_URI) {
-        throw new Error("MONGODB_URI is not defined");
-    }
+// Global cache object for HMR and serverless environments
+let cached = (global as any).mongoose;
 
-    let result;
-
-    try {
-        await mongoose.connect(MONGODB_URI, clientOptions as ConnectOptions);
-        result = await handler(mongoose.connection);
-    } finally {
-        await mongoose.disconnect();
-    }
-
-    return result;
+if (!cached) {
+    cached = (global as any).mongoose = { conn: null, promise: null };
 }
 
-export default makeConnection;
+export default async function connectToDatabase(): Promise<typeof mongoose> {
+    if (cached.conn) return cached.conn;
+
+    if (!cached.promise) {
+        cached.promise = mongoose.connect(MONGODB_URI, clientOptions).then((mongooseInstance) => {
+            return mongooseInstance;
+        });
+    }
+
+    cached.conn = await cached.promise;
+    return cached.conn;
+}
