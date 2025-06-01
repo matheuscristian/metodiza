@@ -10,7 +10,7 @@ import {
 } from "@/components/ui/sidebar";
 import Explorer, { ExplorerRef } from "./explorer";
 import { Dialog, DialogClose, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { FilePlus2, FolderPlus } from "lucide-react";
@@ -27,8 +27,12 @@ export default function NotesLayout({ children }: { children: React.ReactNode })
     const resolverRef = useRef<((value: string | null) => void) | null>(null);
     const dialogInputDefaultValue = useRef<string>("");
 
-    const rootID = useRef<string | null>(null);
+    const [rootID, setRootID] = useState<string | null>(null);
     const rootRef = useRef<ExplorerRef | null>(null);
+
+    useEffect(() => {
+        getRootID().then(setRootID);
+    }, []);
 
     async function createNote() {
         const name = await openDialogInput("Dê um nome para esta nota");
@@ -37,11 +41,7 @@ export default function NotesLayout({ children }: { children: React.ReactNode })
             return;
         }
 
-        if (!rootID.current) {
-            rootID.current = await getRootID();
-        }
-
-        const id = await fCreateNote(name, rootID.current as string);
+        const id = await fCreateNote(name, rootID as string);
 
         rootRef.current?.reload();
 
@@ -55,11 +55,7 @@ export default function NotesLayout({ children }: { children: React.ReactNode })
             return;
         }
 
-        if (!rootID.current) {
-            rootID.current = await getRootID();
-        }
-
-        await fCreatefolder(name, rootID.current as string);
+        await fCreatefolder(name, rootID as string);
 
         rootRef?.current?.reload();
     }
@@ -81,6 +77,10 @@ export default function NotesLayout({ children }: { children: React.ReactNode })
         setDialogOpen(false);
         resolverRef.current?.(value);
         resolverRef.current = null;
+    }
+
+    if (!rootID) {
+        return null;
     }
 
     return (
@@ -141,7 +141,11 @@ export default function NotesLayout({ children }: { children: React.ReactNode })
                                     </div>
                                 </SidebarGroupLabel>
                                 <SidebarGroupContent>
-                                    <Explorer path="/" openDialogInput={openDialogInput} ref={rootRef} />
+                                    <Explorer
+                                        id={rootID ?? undefined}
+                                        openDialogInput={openDialogInput}
+                                        ref={rootRef}
+                                    />
                                 </SidebarGroupContent>
                             </SidebarGroup>
                         </SidebarContent>

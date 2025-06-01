@@ -7,7 +7,6 @@ export type FileNode = {
     _id: string;
     name: string;
     type: "file" | "folder";
-    path: string;
     parent: string | null;
     children?: FileNode[];
 };
@@ -17,7 +16,6 @@ function buildFileTree(parent: IFile, entries: IFile[]): FileNode {
         _id: parent.id,
         name: parent.name,
         type: parent.type,
-        path: parent.path,
         parent: parent.parent?.toString() || null,
         children: [],
     };
@@ -29,7 +27,6 @@ function buildFileTree(parent: IFile, entries: IFile[]): FileNode {
             _id: entry.id,
             name: entry.name,
             type: entry.type,
-            path: entry.path,
             parent: entry.parent?.toString() || null,
         });
     });
@@ -66,20 +63,6 @@ function buildFileTree(parent: IFile, entries: IFile[]): FileNode {
     return root;
 }
 
-export async function findChildrenByPath(path: string): Promise<FileNode> {
-    await connectToDatabase();
-
-    const entry = await filesModel.findOne({ path, type: "folder" }).orFail();
-
-    if (entry.type !== "folder") {
-        throw new Error("Path isn't a folder");
-    }
-
-    const allChildren = await filesModel.find({ parent: entry.id }).exec();
-
-    return buildFileTree(entry, allChildren);
-}
-
 export async function findChildrenByID(id: string): Promise<FileNode> {
     await connectToDatabase();
 
@@ -97,15 +80,15 @@ export async function findChildrenByID(id: string): Promise<FileNode> {
 export async function getRootID() {
     await connectToDatabase();
 
-    return (await filesModel.findOne({ name: "root", path: "/", type: "folder" }).orFail()).id;
+    return (await filesModel.findOne({ name: "root", type: "folder" }).orFail()).id;
 }
 
 export async function createNote(name: string, parentID: string) {
     await connectToDatabase();
 
-    const parent = await filesModel.findOne({ _id: parentID }).orFail();
+    const parent = await filesModel.findOne({ _id: parentID, type: "folder" }).orFail();
 
-    return (await filesModel.create({ name, type: "file", path: parent.path + name, parent: parent.id })).id;
+    return (await filesModel.create({ name, type: "file", parent: parent.id })).id;
 }
 
 export async function deleteNote(noteID: string) {
@@ -117,52 +100,42 @@ export async function deleteNote(noteID: string) {
 export async function renameNote(noteID: string, newName: string) {
     await connectToDatabase();
 
-    const note = await filesModel.findOne({ _id: noteID, type: "file" }).orFail();
-
-    const newPath = note.path?.split("/").filter((p) => p.length);
-    newPath?.pop();
-    newPath?.push(newName);
-
-    await filesModel
-        .findOneAndUpdate({ _id: noteID, type: "file" }, { name: newName, path: "/" + newPath?.join("/") })
-        .orFail();
+    await filesModel.findOneAndUpdate({ _id: noteID, type: "file" }, { name: newName }).orFail();
 }
 
 export async function createFolder(name: string, parentID: string) {
     await connectToDatabase();
 
-    const parent = await filesModel.findOne({ _id: parentID }).orFail();
+    if (name === "root") {
+        throw new Error("Cannot create a folder of name 'root'!");
+    }
 
-    await filesModel.create({ name, type: "folder", path: parent.path + name + "/", parent: parent.id });
+    const parent = await filesModel.findOne({ _id: parentID, type: "folder" }).orFail();
+
+    await filesModel.create({ name, type: "folder", parent: parent.id });
 }
 
 export async function deleteFolder(folderID: string) {
     await connectToDatabase();
 
-    const folder = await filesModel.findOne({ _id: folderID, type: "folder" }).orFail();
-    await filesModel
-        .find({ path: { $regex: `^${folder.path}.*` } })
-        .deleteMany()
-        .orFail();
+    const documents = await filesModel.find({ parent: folderID });
+
+    for (const d of documents) {
+        if (d.type === "file") {
+            await d.deleteOne().orFail();
+            continue;
+        }
+
+        await deleteFolder(d.id);
+    }
+
+    await filesModel.findByIdAndDelete(folderID).orFail();
 }
 
 export async function renamefolder(folderID: string, newName: string) {
     await connectToDatabase();
 
-    const folder = await filesModel.findOne({ _id: folderID, type: "folder" }).orFail();
-
-    const splitPath = folder.path?.split("/").filter((p) => p.length);
-    splitPath?.pop();
-    splitPath?.push(newName);
-    const newPath = "/" + splitPath?.join("/") + "/";
-
-    (await filesModel.find({ path: { $regex: `^${folder.path}.*` } })).forEach(async (d) => {
-        const documentPath = d.path;
-
-        await filesModel.findByIdAndUpdate(d.id, { path: newPath + documentPath?.replace(folder.path, "") }).orFail();
-    });
-
-    await filesModel.findByIdAndUpdate(folderID, { name: newName }).orFail();
+    await filesModel.findOneAndUpdate({ _id: folderID, type: "folder" }, { name: newName }).orFail();
 }
 
 export async function getNoteContent(id: string) {
@@ -175,4 +148,14 @@ export async function saveNote(id: string, content: string) {
     await connectToDatabase();
 
     await filesModel.findOne({ _id: id, type: "file" }).updateOne({ content }).orFail();
+}
+
+export async function hasNote(id: string): Promise<boolean> {
+    await connectToDatabase();
+
+    return await filesModel
+        .findOne({ _id: id, type: "file" })
+        .orFail()
+        .then(() => true)
+        .catch(() => false);
 }

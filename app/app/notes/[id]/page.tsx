@@ -1,4 +1,4 @@
-import { getNoteContent } from "@/app/actions";
+import { getNoteContent, hasNote } from "@/app/actions";
 import TextArea from "../textarea";
 
 export default async function Page({
@@ -9,6 +9,11 @@ export default async function Page({
     params: Promise<{ id: string }>;
 }) {
     const { id } = await params;
+
+    if (!(await hasNote(id))) {
+        return null;
+    }
+
     const { name } = await searchParams;
 
     if (!id || !name) {

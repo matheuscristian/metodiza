@@ -9,11 +9,12 @@ import {
     renamefolder as fRenameFolder,
     FileNode,
     findChildrenByID,
-    findChildrenByPath,
+    hasNote,
 } from "@/app/actions";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { ContextMenu, ContextMenuContent, ContextMenuItem, ContextMenuTrigger } from "@/components/ui/context-menu";
 import { SidebarMenu, SidebarMenuButton, SidebarMenuSub } from "@/components/ui/sidebar";
+import { cn } from "@/lib/utils";
 import { ChevronRight, File, FilePlus2, FolderPlus, SquarePen, Trash2 } from "lucide-react";
 import Link from "next/link";
 import { redirect, usePathname } from "next/navigation";
@@ -26,39 +27,38 @@ export type ExplorerRef = {
 const treeCache = new Map<string, FileNode>();
 
 export default function Explorer({
-    path,
     id,
     openDialogInput,
     ref,
 }: {
-    path?: string;
     id?: string;
     openDialogInput: (title: string, defaultValue?: string) => Promise<string | null>;
     ref?: React.RefObject<ExplorerRef | null>;
 }) {
     const [fileTree, setFileTree] = useState<FileNode | null>(null);
-    const cacheKey = path || id;
+    const [folderOpenState, setFolderOpenState] = useState<Record<string, boolean>>({});
 
-    const pathName = usePathname();
+    const pathNoteID = usePathname()
+        .split("/")
+        .filter((p) => p.length)
+        .slice(2)[0];
 
     const childrenRefs = useRef<Map<string, React.RefObject<ExplorerRef | null>>>(new Map());
 
     const reloadTree = useCallback(() => {
-        if (!cacheKey) throw new Error("Path or ID is needed to build tree");
+        if (!id) throw new Error("ID is needed to build tree");
 
-        const fetchFn = path ? findChildrenByPath : findChildrenByID;
-
-        fetchFn(cacheKey).then((data) => {
-            treeCache.set(cacheKey, data);
+        findChildrenByID(id).then((data) => {
+            treeCache.set(id, data);
             setFileTree(data);
         });
-    }, [cacheKey, path]);
+    }, [id]);
 
     useImperativeHandle(ref, () => ({ reload: reloadTree }), [reloadTree]);
 
     useEffect(() => {
         reloadTree();
-    }, [cacheKey, reloadTree]);
+    }, [id, reloadTree]);
 
     async function createNote(parentID: string) {
         const name = await openDialogInput("Dê um nome para esta nota");
@@ -66,6 +66,8 @@ export default function Explorer({
         if (!name) {
             return;
         }
+
+        setFolderOpenState((prev) => ({ ...prev, [parentID]: true }));
 
         const id = await fCreateNote(name, parentID);
 
@@ -79,7 +81,7 @@ export default function Explorer({
 
         reloadTree();
 
-        if (pathName.endsWith(noteID)) {
+        if (pathNoteID === noteID) {
             redirect(`/app/notes/`);
         }
     }
@@ -95,7 +97,7 @@ export default function Explorer({
 
         reloadTree();
 
-        if (pathName.endsWith(noteID)) {
+        if (pathNoteID === noteID) {
             redirect(`/app/notes/${noteID}?name=${name}`);
         }
     }
@@ -107,6 +109,8 @@ export default function Explorer({
             return;
         }
 
+        setFolderOpenState((prev) => ({ ...prev, [parentID]: true }));
+
         await fCreatefolder(name, parentID);
 
         childrenRefs.current.get(parentID)?.current?.reload();
@@ -116,6 +120,10 @@ export default function Explorer({
         await fDeleteFolder(folderID);
 
         reloadTree();
+
+        if (!(await hasNote(pathNoteID))) {
+            redirect("/app/notes");
+        }
     }
 
     async function renameFolder(noteID: string, prevName: string) {
@@ -130,19 +138,21 @@ export default function Explorer({
         reloadTree();
     }
 
-    if (!cacheKey) {
-        throw new Error("Path or ID is needed to build tree");
+    if (!id) {
+        throw new Error("ID is needed to build tree");
     }
 
     return (
         <SidebarMenu>
-            {(fileTree?.children || treeCache.get(cacheKey)?.children || []).map((f) => {
+            {(treeCache.get(id)?.children || fileTree?.children || []).map((f) => {
                 if (f.type === "file") {
                     return (
                         <ContextMenu key={f._id}>
                             <ContextMenuTrigger asChild>
                                 <Link href={`/app/notes/${f._id}?name=${f.name}`}>
-                                    <SidebarMenuButton className="hover:cursor-pointer">
+                                    <SidebarMenuButton
+                                        className={cn("hover:cursor-pointer", pathNoteID === f._id && "bg-gray-500/15")}
+                                    >
                                         <File /> {f.name}
                                     </SidebarMenuButton>
                                 </Link>
@@ -166,7 +176,11 @@ export default function Explorer({
                 childrenRefs.current.set(f._id, ref);
 
                 return (
-                    <Collapsible key={f._id}>
+                    <Collapsible
+                        key={f._id}
+                        open={folderOpenState[f._id]}
+                        onOpenChange={(s) => setFolderOpenState((prev) => ({ ...prev, [f._id]: s }))}
+                    >
                         <ContextMenu>
                             <CollapsibleTrigger asChild>
                                 <ContextMenuTrigger asChild>
@@ -196,7 +210,7 @@ export default function Explorer({
                         </ContextMenu>
 
                         <CollapsibleContent>
-                            <SidebarMenuSub>
+                            <SidebarMenuSub className="mr-0 pr-0 min-w-[220px]">
                                 <Explorer id={f._id} openDialogInput={openDialogInput} ref={ref} />
                             </SidebarMenuSub>
                         </CollapsibleContent>
