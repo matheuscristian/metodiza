@@ -12,7 +12,7 @@ export default function SideNav() {
         { icon: "/notes.svg", path: "/app/notes", label: "Notas" },
         { icon: "/agenda.svg", path: "/app/agenda", label: "Agenda" },
         { icon: "/graph.svg", path: "/app/graph", label: "Grafo" },
-        { icon: "/brainstorm.svg", path: "/app/brainstorm", label: "Brainstorm" },
+        { icon: "/dictionary.svg", path: "/app/dictionary", label: "Dicionário" },
         { icon: "/pomodoro.svg", path: "/app/pomodoro", label: "Pomodoro Timer" },
     ];
 

@@ -1,148 +1,86 @@
 "use client";
 
-import {
-    createNote as fCreateNote,
-    deleteNote as fDeleteNote,
-    renameNote as fRenameNote,
-    createFolder as fCreatefolder,
-    deleteFolder as fDeleteFolder,
-    renamefolder as fRenameFolder,
-    FileNode,
-    findChildrenByID,
-    findChildrenByPath,
-} from "@/app/actions";
+import { findChildrenByID } from "@/app/app/notes/actions";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { ContextMenu, ContextMenuContent, ContextMenuItem, ContextMenuTrigger } from "@/components/ui/context-menu";
 import { SidebarMenu, SidebarMenuButton, SidebarMenuSub } from "@/components/ui/sidebar";
+import useFolder from "@/app/app/notes/hooks/use-folder";
+import useNote from "@/app/app/notes/hooks/use-note";
+import { cn } from "@/lib/utils";
+import { ExplorerRef } from "@/types/explorer";
+import { FileNode } from "@/types/file";
 import { ChevronRight, File, FilePlus2, FolderPlus, SquarePen, Trash2 } from "lucide-react";
 import Link from "next/link";
-import { redirect, usePathname } from "next/navigation";
+import { usePathname } from "next/navigation";
 import React, { useCallback, useEffect, useImperativeHandle, useRef, useState } from "react";
-
-export type ExplorerRef = {
-    reload: () => void;
-};
 
 const treeCache = new Map<string, FileNode>();
 
 export default function Explorer({
-    path,
     id,
     openDialogInput,
     ref,
 }: {
-    path?: string;
     id?: string;
     openDialogInput: (title: string, defaultValue?: string) => Promise<string | null>;
     ref?: React.RefObject<ExplorerRef | null>;
 }) {
     const [fileTree, setFileTree] = useState<FileNode | null>(null);
-    const cacheKey = path || id;
-
-    const pathName = usePathname();
+    const [folderOpenState, setFolderOpenState] = useState<Record<string, boolean>>({});
 
     const childrenRefs = useRef<Map<string, React.RefObject<ExplorerRef | null>>>(new Map());
 
+    const pathNoteID = usePathname()
+        .split("/")
+        .filter((p) => p.length)
+        .slice(2)[0];
+
     const reloadTree = useCallback(() => {
-        if (!cacheKey) throw new Error("Path or ID is needed to build tree");
+        if (!id) throw new Error("ID is needed to build tree");
 
-        const fetchFn = path ? findChildrenByPath : findChildrenByID;
-
-        fetchFn(cacheKey).then((data) => {
-            treeCache.set(cacheKey, data);
+        findChildrenByID(id).then((data) => {
+            treeCache.set(id, data);
             setFileTree(data);
         });
-    }, [cacheKey, path]);
-
-    useImperativeHandle(ref, () => ({ reload: reloadTree }), [reloadTree]);
+    }, [id]);
 
     useEffect(() => {
         reloadTree();
-    }, [cacheKey, reloadTree]);
+    }, [id, reloadTree]);
 
-    async function createNote(parentID: string) {
-        const name = await openDialogInput("Dê um nome para esta nota");
+    useImperativeHandle(ref, () => ({ reload: reloadTree }), [reloadTree]);
 
-        if (!name) {
-            return;
-        }
+    const [createNote, renameNote, deleteNote] = useNote(
+        pathNoteID,
+        openDialogInput,
+        setFolderOpenState,
+        childrenRefs,
+        reloadTree
+    );
 
-        const id = await fCreateNote(name, parentID);
+    const [createFolder, renameFolder, deleteFolder] = useFolder(
+        pathNoteID,
+        openDialogInput,
+        setFolderOpenState,
+        childrenRefs,
+        reloadTree
+    );
 
-        childrenRefs.current.get(parentID)?.current?.reload();
-
-        redirect(`/app/notes/${id}?name=${name}`);
-    }
-
-    async function deleteNote(noteID: string) {
-        await fDeleteNote(noteID);
-
-        reloadTree();
-
-        if (pathName.endsWith(noteID)) {
-            redirect(`/app/notes/`);
-        }
-    }
-
-    async function renameNote(noteID: string, prevName: string) {
-        const name = await openDialogInput("Dê um nome para esta nota", prevName);
-
-        if (!name) {
-            return;
-        }
-
-        await fRenameNote(noteID, name);
-
-        reloadTree();
-
-        if (pathName.endsWith(noteID)) {
-            redirect(`/app/notes/${noteID}?name=${name}`);
-        }
-    }
-
-    async function createFolder(parentID: string) {
-        const name = await openDialogInput("Dê um nome para esta pasta");
-
-        if (!name) {
-            return;
-        }
-
-        await fCreatefolder(name, parentID);
-
-        childrenRefs.current.get(parentID)?.current?.reload();
-    }
-
-    async function deleteFolder(folderID: string) {
-        await fDeleteFolder(folderID);
-
-        reloadTree();
-    }
-
-    async function renameFolder(noteID: string, prevName: string) {
-        const name = await openDialogInput("Dê um nome para esta pasta", prevName);
-
-        if (!name) {
-            return;
-        }
-
-        await fRenameFolder(noteID, name);
-
-        reloadTree();
-    }
-
-    if (!cacheKey) {
-        throw new Error("Path or ID is needed to build tree");
+    if (!id) {
+        throw new Error("ID is needed to build tree");
     }
 
     return (
         <SidebarMenu>
-            {(fileTree?.children || treeCache.get(cacheKey)?.children || []).map((f) => {
+            {(fileTree?.children || treeCache.get(id)?.children || []).map((f) => {
                 if (f.type === "file") {
                     return (
                         <ContextMenu key={f._id}>
                             <ContextMenuTrigger asChild>
                                 <Link href={`/app/notes/${f._id}?name=${f.name}`}>
-                                    <SidebarMenuButton className="hover:cursor-pointer">
+                                    <SidebarMenuButton
+                                        className={cn("hover:cursor-pointer", pathNoteID === f._id && "bg-gray-500/15")}
+                                    >
                                         <File /> {f.name}
                                     </SidebarMenuButton>
                                 </Link>
@@ -166,7 +104,11 @@ export default function Explorer({
                 childrenRefs.current.set(f._id, ref);
 
                 return (
-                    <Collapsible key={f._id}>
+                    <Collapsible
+                        key={f._id}
+                        open={folderOpenState[f._id]}
+                        onOpenChange={(s) => setFolderOpenState((prev) => ({ ...prev, [f._id]: s }))}
+                    >
                         <ContextMenu>
                             <CollapsibleTrigger asChild>
                                 <ContextMenuTrigger asChild>
@@ -196,7 +138,7 @@ export default function Explorer({
                         </ContextMenu>
 
                         <CollapsibleContent>
-                            <SidebarMenuSub>
+                            <SidebarMenuSub className="mr-0 pr-0 min-w-[220px]">
                                 <Explorer id={f._id} openDialogInput={openDialogInput} ref={ref} />
                             </SidebarMenuSub>
                         </CollapsibleContent>

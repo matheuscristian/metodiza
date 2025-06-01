@@ -1,18 +1,17 @@
 import connectToDatabase from "@/lib/db";
-import filesModel from "@/model/files.model";
+import filesModel from "@/models/file.model";
 
 export async function GET() {
     await connectToDatabase();
 
     await filesModel.find({}).deleteMany().orFail();
 
-    const root = await filesModel.create({ name: "root", type: "folder", path: "/" });
+    const root = await filesModel.create({ name: "root", type: "folder" });
 
     const abacate = await filesModel.create({
         name: "Abacate",
         type: "folder",
         parent: root.id,
-        path: "/Abacate/",
     });
 
     await filesModel.create({
@@ -20,7 +19,6 @@ export async function GET() {
         type: "file",
         content: "Hummmmm",
         parent: abacate.id,
-        path: "/Abacate/Queijo Minas",
     });
 
     await filesModel.create({
@@ -28,7 +26,6 @@ export async function GET() {
         type: "file",
         content: "adoro",
         parent: root.id,
-        path: "/Cafezinho",
     });
 
     return new Response(JSON.stringify(await filesModel.find({}).orFail()), {
