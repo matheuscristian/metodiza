@@ -5,6 +5,7 @@ import { ChangeEvent, useEffect, useRef, useState } from "react";
 import TextareaAutosize from "react-textarea-autosize";
 
 export default function TextArea({ content, id, name }: { content: string; id: string; name: string }) {
+    const inputRef = useRef<HTMLTextAreaElement>(null);
     const [value, setValue] = useState("Carregando...");
     const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
@@ -25,6 +26,7 @@ export default function TextArea({ content, id, name }: { content: string; id: s
 
     useEffect(() => {
         setValue(content);
+        inputRef.current?.focus();
     }, [content]);
 
     return (
@@ -36,6 +38,7 @@ export default function TextArea({ content, id, name }: { content: string; id: s
                 minRows={1}
                 placeholder="Começe digitando algo brilhante..."
                 onChange={handleChange}
+                ref={inputRef}
             />
         </>
     );
