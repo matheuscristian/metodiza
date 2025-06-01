@@ -1,11 +1,5 @@
-import mongoose, { Document, Model } from "mongoose";
-
-export interface IFile extends Document {
-    name: string;
-    type: "file" | "folder";
-    content?: string | null;
-    parent?: mongoose.Types.ObjectId | null;
-}
+import { IFile } from "@/types/file";
+import mongoose, { Model } from "mongoose";
 
 const FileSchema = new mongoose.Schema<IFile>({
     name: { type: String, required: true },

@@ -1,6 +1,6 @@
 "use client";
 
-import { saveNote } from "@/app/actions";
+import { saveNote } from "@/app/app/notes/actions";
 import { ChangeEvent, useEffect, useRef, useState } from "react";
 import TextareaAutosize from "react-textarea-autosize";
 

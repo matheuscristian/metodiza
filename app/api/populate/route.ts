@@ -1,5 +1,5 @@
 import connectToDatabase from "@/lib/db";
-import filesModel from "@/model/files.model";
+import filesModel from "@/models/file.model";
 
 export async function GET() {
     await connectToDatabase();

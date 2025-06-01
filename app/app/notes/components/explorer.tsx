@@ -1,28 +1,18 @@
 "use client";
 
-import {
-    createNote as fCreateNote,
-    deleteNote as fDeleteNote,
-    renameNote as fRenameNote,
-    createFolder as fCreatefolder,
-    deleteFolder as fDeleteFolder,
-    renamefolder as fRenameFolder,
-    FileNode,
-    findChildrenByID,
-    hasNote,
-} from "@/app/actions";
+import { findChildrenByID } from "@/app/app/notes/actions";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { ContextMenu, ContextMenuContent, ContextMenuItem, ContextMenuTrigger } from "@/components/ui/context-menu";
 import { SidebarMenu, SidebarMenuButton, SidebarMenuSub } from "@/components/ui/sidebar";
+import useFolder from "@/app/app/notes/hooks/use-folder";
+import useNote from "@/app/app/notes/hooks/use-note";
 import { cn } from "@/lib/utils";
+import { ExplorerRef } from "@/types/explorer";
+import { FileNode } from "@/types/file";
 import { ChevronRight, File, FilePlus2, FolderPlus, SquarePen, Trash2 } from "lucide-react";
 import Link from "next/link";
-import { redirect, usePathname } from "next/navigation";
+import { usePathname } from "next/navigation";
 import React, { useCallback, useEffect, useImperativeHandle, useRef, useState } from "react";
-
-export type ExplorerRef = {
-    reload: () => void;
-};
 
 const treeCache = new Map<string, FileNode>();
 
@@ -38,12 +28,12 @@ export default function Explorer({
     const [fileTree, setFileTree] = useState<FileNode | null>(null);
     const [folderOpenState, setFolderOpenState] = useState<Record<string, boolean>>({});
 
+    const childrenRefs = useRef<Map<string, React.RefObject<ExplorerRef | null>>>(new Map());
+
     const pathNoteID = usePathname()
         .split("/")
         .filter((p) => p.length)
         .slice(2)[0];
-
-    const childrenRefs = useRef<Map<string, React.RefObject<ExplorerRef | null>>>(new Map());
 
     const reloadTree = useCallback(() => {
         if (!id) throw new Error("ID is needed to build tree");
@@ -54,89 +44,27 @@ export default function Explorer({
         });
     }, [id]);
 
-    useImperativeHandle(ref, () => ({ reload: reloadTree }), [reloadTree]);
-
     useEffect(() => {
         reloadTree();
     }, [id, reloadTree]);
 
-    async function createNote(parentID: string) {
-        const name = await openDialogInput("Dê um nome para esta nota");
+    useImperativeHandle(ref, () => ({ reload: reloadTree }), [reloadTree]);
 
-        if (!name) {
-            return;
-        }
+    const [createNote, renameNote, deleteNote] = useNote(
+        pathNoteID,
+        openDialogInput,
+        setFolderOpenState,
+        childrenRefs,
+        reloadTree
+    );
 
-        setFolderOpenState((prev) => ({ ...prev, [parentID]: true }));
-
-        const id = await fCreateNote(name, parentID);
-
-        childrenRefs.current.get(parentID)?.current?.reload();
-
-        redirect(`/app/notes/${id}?name=${name}`);
-    }
-
-    async function deleteNote(noteID: string) {
-        await fDeleteNote(noteID);
-
-        reloadTree();
-
-        if (pathNoteID === noteID) {
-            redirect(`/app/notes/`);
-        }
-    }
-
-    async function renameNote(noteID: string, prevName: string) {
-        const name = await openDialogInput("Dê um nome para esta nota", prevName);
-
-        if (!name) {
-            return;
-        }
-
-        await fRenameNote(noteID, name);
-
-        reloadTree();
-
-        if (pathNoteID === noteID) {
-            redirect(`/app/notes/${noteID}?name=${name}`);
-        }
-    }
-
-    async function createFolder(parentID: string) {
-        const name = await openDialogInput("Dê um nome para esta pasta");
-
-        if (!name) {
-            return;
-        }
-
-        setFolderOpenState((prev) => ({ ...prev, [parentID]: true }));
-
-        await fCreatefolder(name, parentID);
-
-        childrenRefs.current.get(parentID)?.current?.reload();
-    }
-
-    async function deleteFolder(folderID: string) {
-        await fDeleteFolder(folderID);
-
-        reloadTree();
-
-        if (!(await hasNote(pathNoteID))) {
-            redirect("/app/notes");
-        }
-    }
-
-    async function renameFolder(noteID: string, prevName: string) {
-        const name = await openDialogInput("Dê um nome para esta pasta", prevName);
-
-        if (!name) {
-            return;
-        }
-
-        await fRenameFolder(noteID, name);
-
-        reloadTree();
-    }
+    const [createFolder, renameFolder, deleteFolder] = useFolder(
+        pathNoteID,
+        openDialogInput,
+        setFolderOpenState,
+        childrenRefs,
+        reloadTree
+    );
 
     if (!id) {
         throw new Error("ID is needed to build tree");
@@ -144,7 +72,7 @@ export default function Explorer({
 
     return (
         <SidebarMenu>
-            {(treeCache.get(id)?.children || fileTree?.children || []).map((f) => {
+            {(fileTree?.children || treeCache.get(id)?.children || []).map((f) => {
                 if (f.type === "file") {
                     return (
                         <ContextMenu key={f._id}>

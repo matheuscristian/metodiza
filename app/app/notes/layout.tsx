@@ -8,24 +8,26 @@ import {
     SidebarGroupLabel,
     SidebarGroupContent,
 } from "@/components/ui/sidebar";
-import Explorer, { ExplorerRef } from "./explorer";
+import Explorer from "./components/explorer";
 import { Dialog, DialogClose, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { FilePlus2, FolderPlus } from "lucide-react";
-import { createNote as fCreateNote, createFolder as fCreatefolder, getRootID } from "@/app/actions";
+import { createNote, createFolder, getRootID } from "@/app/app/notes/actions";
 import { Label } from "@/components/ui/label";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { redirect } from "next/navigation";
+import { ExplorerRef } from "@/types/explorer";
 
 export default function NotesLayout({ children }: { children: React.ReactNode }) {
-    const dialogTitleRef = useRef("");
     const inputRef = useRef<HTMLInputElement>(null);
 
     const [dialogOpen, setDialogOpen] = useState(false);
-    const resolverRef = useRef<((value: string | null) => void) | null>(null);
+    const dialogTitleRef = useRef("");
     const dialogInputDefaultValue = useRef<string>("");
+
+    const resolverRef = useRef<((value: string | null) => void) | null>(null);
 
     const [rootID, setRootID] = useState<string | null>(null);
     const rootRef = useRef<ExplorerRef | null>(null);
@@ -34,28 +36,28 @@ export default function NotesLayout({ children }: { children: React.ReactNode })
         getRootID().then(setRootID);
     }, []);
 
-    async function createNote() {
+    async function handleCreateNote() {
         const name = await openDialogInput("Dê um nome para esta nota");
 
         if (!name) {
             return;
         }
 
-        const id = await fCreateNote(name, rootID as string);
+        const id = await createNote(name, rootID as string);
 
         rootRef.current?.reload();
 
         redirect(`/app/notes/${id}?name=${name}`);
     }
 
-    async function createFolder() {
+    async function handleCreateFolder() {
         const name = await openDialogInput("Dê um nome para esta pasta");
 
         if (!name) {
             return;
         }
 
-        await fCreatefolder(name, rootID as string);
+        await createFolder(name, rootID as string);
 
         rootRef?.current?.reload();
     }
@@ -131,12 +133,12 @@ export default function NotesLayout({ children }: { children: React.ReactNode })
                                         <FilePlus2
                                             width={15}
                                             className="opacity-50 hover:opacity-85 hover:cursor-pointer"
-                                            onClick={createNote}
+                                            onClick={handleCreateNote}
                                         />
                                         <FolderPlus
                                             width={15}
                                             className="opacity-50 hover:opacity-85 hover:cursor-pointer"
-                                            onClick={createFolder}
+                                            onClick={handleCreateFolder}
                                         />
                                     </div>
                                 </SidebarGroupLabel>

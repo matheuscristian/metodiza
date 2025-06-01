@@ -1,5 +1,5 @@
-import { getNoteContent, hasNote } from "@/app/actions";
-import TextArea from "../textarea";
+import { getNoteContent, hasNote } from "@/app/app/notes/actions";
+import TextArea from "./components/textarea";
 
 export default async function Page({
     searchParams,
