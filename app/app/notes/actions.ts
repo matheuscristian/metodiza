@@ -73,7 +73,7 @@ export async function findChildrenByID(id: string): Promise<FileNode> {
 export async function getRootID() {
     await connectToDatabase();
 
-    return (await fileModel.findOne({ name: "root", type: "folder" }).orFail()).id;
+    return (await fileModel.findOne({ name: "root", type: "folder" }).orFail().catch(async () => await fileModel.create({ name: "root", type: "folder" }))).id;
 }
 
 export async function createNote(name: string, parentID: string) {
