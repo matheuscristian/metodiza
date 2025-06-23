@@ -1,45 +1,45 @@
 "use client";
 
 import { saveNote } from "@/app/app/notes/actions";
-import { ChangeEvent, useEffect, useRef, useState } from "react";
-import TextareaAutosize from "react-textarea-autosize";
+import { useRef } from "react";
+// import TextareaAutosize from "react-textarea-autosize";
+import { EditorContent, useEditor } from "@tiptap/react";
+import StarterKit from "@tiptap/starter-kit";
+import Placeholder from "@tiptap/extension-placeholder";
+import "./editor.css";
 
 export default function TextArea({ content, id, name }: { content: string; id: string; name: string }) {
-    const inputRef = useRef<HTMLTextAreaElement>(null);
-    const [value, setValue] = useState("Carregando...");
     const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
-    function handleChange(e: ChangeEvent<HTMLTextAreaElement>) {
-        e.preventDefault();
+    const editor = useEditor({
+        extensions: [
+            StarterKit.configure({ hardBreak: { keepMarks: true } }),
+            Placeholder.configure({ placeholder: "Começe digitando algo brilhante..." }),
+        ],
+        content,
+        autofocus: true,
+        injectCSS: false,
+        onUpdate(e) {
+            if (timeoutRef.current !== null) {
+                clearTimeout(timeoutRef.current);
+            }
 
-        if (timeoutRef.current !== null) {
-            clearTimeout(timeoutRef.current);
-        }
-
-        timeoutRef.current = setTimeout(() => {
-            console.log("Saving...");
-            saveNote(id, e.target.value);
-        }, 300);
-
-        setValue(e.target.value);
-    }
-
-    useEffect(() => {
-        setValue(content);
-        inputRef.current?.focus();
-    }, [content]);
+            timeoutRef.current = setTimeout(() => {
+                console.log("Saving...");
+                saveNote(id, e.editor.getHTML());
+            }, 300);
+        },
+        editorProps: {
+            attributes: {
+                class: "min-h-[75vh] relative min-w-full focus:outline-0 prose prose-invert prose-p:my-1 prose-sm text-white prose-ul:marker:text-white",
+            },
+        },
+    });
 
     return (
         <>
             <h1 className="font-bold mb-7 text-3xl select-none">{name}</h1>
-            <TextareaAutosize
-                className="w-full bg-transparent border-0 outline-none shadow-none focus:outline-none focus:ring-0 resize-none min-h-[60vh]"
-                value={value}
-                minRows={1}
-                placeholder="Começe digitando algo brilhante..."
-                onChange={handleChange}
-                ref={inputRef}
-            />
+            <EditorContent className="w-full" editor={editor} />
         </>
     );
 }
