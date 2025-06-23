@@ -5,6 +5,7 @@ import { useRef } from "react";
 import { BubbleMenu, EditorContent, useEditor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import Placeholder from "@tiptap/extension-placeholder";
+import ExtLink from "@tiptap/extension-link";
 import ExtUnderline from "@tiptap/extension-underline";
 import "./editor.css";
 import { Bold, Italic, List, ListOrdered, Strikethrough, Underline } from "lucide-react";
@@ -18,6 +19,11 @@ export default function TextArea({ content, id, name }: { content: string; id: s
             StarterKit.configure({ hardBreak: { keepMarks: true }, heading: { levels: [1, 2] } }),
             Placeholder.configure({ placeholder: "Começe digitando algo brilhante..." }),
             ExtUnderline,
+            ExtLink.configure({
+                autolink: true,
+                openOnClick: true,
+                linkOnPaste: true,
+            }),
         ],
         content,
         autofocus: true,
@@ -34,7 +40,7 @@ export default function TextArea({ content, id, name }: { content: string; id: s
         },
         editorProps: {
             attributes: {
-                class: "min-h-[75vh] relative min-w-full focus:outline-0 prose prose-invert prose-p:my-1 prose-md prose-h1:text-[1.25em] prose-h2:text-[1rem] text-gray-100 prose-ul:marker:text-white",
+                class: "min-h-[75vh] relative min-w-full focus:outline-0 prose prose-invert prose-p:my-1 prose-a:cursor-pointer prose-a:hover:text-gray-200 prose-md prose-h1:text-[1.25em] prose-h2:text-[1rem] text-gray-100 prose-ul:marker:text-white",
             },
         },
         onSelectionUpdate() {
