@@ -2,7 +2,6 @@
 
 import { saveNote } from "@/app/app/notes/actions";
 import { useRef } from "react";
-// import TextareaAutosize from "react-textarea-autosize";
 import { EditorContent, useEditor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import Placeholder from "@tiptap/extension-placeholder";
