@@ -12,7 +12,6 @@ import { Bold, Italic, List, ListOrdered, Strikethrough, Underline } from "lucid
 
 export default function TextArea({ content, id, name }: { content: string; id: string; name: string }) {
     const timeoutRef = useRef<NodeJS.Timeout | null>(null);
-    const showFloating = useRef<boolean>(false);
 
     const editor = useEditor({
         extensions: [
@@ -28,6 +27,11 @@ export default function TextArea({ content, id, name }: { content: string; id: s
         content,
         autofocus: true,
         injectCSS: false,
+        editorProps: {
+            attributes: {
+                class: "min-h-[75vh] relative min-w-full focus:outline-0 prose prose-invert prose-p:my-1 prose-a:cursor-pointer prose-a:hover:text-gray-200 prose-md prose-h1:text-[1.25em] prose-h2:text-[1rem] text-gray-100 prose-ul:marker:text-white",
+            },
+        },
         onUpdate(e) {
             if (timeoutRef.current !== null) {
                 clearTimeout(timeoutRef.current);
@@ -38,19 +42,12 @@ export default function TextArea({ content, id, name }: { content: string; id: s
                 saveNote(id, e.editor.getHTML());
             }, 300);
         },
-        editorProps: {
-            attributes: {
-                class: "min-h-[75vh] relative min-w-full focus:outline-0 prose prose-invert prose-p:my-1 prose-a:cursor-pointer prose-a:hover:text-gray-200 prose-md prose-h1:text-[1.25em] prose-h2:text-[1rem] text-gray-100 prose-ul:marker:text-white",
-            },
-        },
-        onSelectionUpdate() {
-            showFloating.current = true;
-        },
     });
 
     return (
-        <>
+        <div>
             <h1 className="font-bold mb-7 text-3xl select-none">{name}</h1>
+            <EditorContent className="w-full" editor={editor} />
             {editor && (
                 <BubbleMenu editor={editor} tippyOptions={{ placement: "top" }}>
                     <div className="floating-menu">
@@ -94,7 +91,6 @@ export default function TextArea({ content, id, name }: { content: string; id: s
                     </div>
                 </BubbleMenu>
             )}
-            <EditorContent className="w-full" editor={editor} />
-        </>
+        </div>
     );
 }
