@@ -1,6 +1,8 @@
 import { Button } from "@/components/ui/button";
 import { Book, Clock, PenSquare } from "lucide-react";
 import Image from "next/image";
+import "./page.css";
+
 export default function Home() {
     const logoSize = 300;
     const cardIconSize = 25;
@@ -29,7 +31,7 @@ export default function Home() {
                                 </p>
                             </div>
 
-                            <Button className="py-5 px-25 mt-10 rounded-[5px] text-white bg-[#35C0D2] hover:bg-[#4d8991]">
+                            <Button className="py-5 px-25 mt-10 rounded-[5px] text-white bg-[#35C0D2] hover:bg-[#4d8991] active:scale-[99%] will-change-transform duration-100">
                                 Cadastrar
                             </Button>
                         </div>
@@ -46,17 +48,19 @@ export default function Home() {
             </div>
             <div className="py-10">
                 <div className="w-full px-52 flex justify-around">
-                    <div className="grid grid-cols-[auto_1fr] max-w-[280px] gap-4 bg-black/15 p-5 rounded-md">
+                    <div className="overview-card">
                         <PenSquare size={cardIconSize} className="my-auto" />
-                        <p className="text-xl">Faça sua anotações Escreva suas dúvidas Organize suas ideias</p>
+                        <p className="text-xl leading-8">
+                            Faça sua anotações Escreva suas dúvidas Organize suas ideias
+                        </p>
                     </div>
-                    <div className="grid grid-cols-[auto_1fr] max-w-[280px] gap-4 bg-black/15 p-5 rounded-md">
+                    <div className="overview-card">
                         <Clock size={cardIconSize} className="my-auto" />
-                        <p className="text-xl">Organize seu tempo Faça a sua rotina Planeje seus estudos</p>
+                        <p className="text-xl leading-8">Organize seu tempo Faça a sua rotina Planeje seus estudos</p>
                     </div>
-                    <div className="grid grid-cols-[auto_1fr] max-w-[280px] gap-4 bg-black/15 p-5 rounded-md">
+                    <div className="overview-card">
                         <Book size={cardIconSize} className="my-auto" />
-                        <p className="text-xl">Decida a forma na qual você irá aplicar seus conhecimentos</p>
+                        <p className="text-xl leading-8">Decida a forma na qual você irá aplicar seus conhecimentos</p>
                     </div>
                 </div>
             </div>
