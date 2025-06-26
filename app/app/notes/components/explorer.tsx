@@ -1,6 +1,6 @@
 "use client";
 
-import { findChildrenByID } from "@/app/app/notes/actions";
+import { findChildrenByID, searchNotes } from "@/app/app/notes/actions";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { ContextMenu, ContextMenuContent, ContextMenuItem, ContextMenuTrigger } from "@/components/ui/context-menu";
 import { SidebarMenu, SidebarMenuButton, SidebarMenuSub } from "@/components/ui/sidebar";
@@ -18,10 +18,12 @@ const treeCache = new Map<string, FileNode>();
 
 export default function Explorer({
     id,
+    search,
     openDialogInput,
     ref,
 }: {
     id?: string;
+    search?: string;
     openDialogInput: (title: string, defaultValue?: string) => Promise<string | null>;
     ref?: React.RefObject<ExplorerRef | null>;
 }) {
@@ -38,15 +40,23 @@ export default function Explorer({
     const reloadTree = useCallback(() => {
         if (!id) throw new Error("ID is needed to build tree");
 
-        findChildrenByID(id).then((data) => {
-            treeCache.set(id, data);
-            setFileTree(data);
-        });
-    }, [id]);
+        if (!search) {
+            findChildrenByID(id).then((data) => {
+                treeCache.set(id, data);
+                setFileTree(data);
+            });
+        } else {
+            searchNotes(search).then((data) => {
+                console.log(data);
+
+                setFileTree(data);
+            });
+        }
+    }, [id, search]);
 
     useEffect(() => {
         reloadTree();
-    }, [id, reloadTree]);
+    }, [id, search, reloadTree]);
 
     useImperativeHandle(ref, () => ({ reload: reloadTree }), [reloadTree]);
 

@@ -13,7 +13,7 @@ import { Dialog, DialogClose, DialogContent, DialogFooter, DialogHeader, DialogT
 import { useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { FilePlus2, FolderPlus } from "lucide-react";
+import { FilePlus2, FolderPlus, Search } from "lucide-react";
 import { createNote, createFolder, getRootID } from "@/app/app/notes/actions";
 import { Label } from "@/components/ui/label";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -24,6 +24,7 @@ export default function NotesLayout({ children }: { children: React.ReactNode })
     const inputRef = useRef<HTMLInputElement>(null);
 
     const [dialogOpen, setDialogOpen] = useState(false);
+    const [search, setSearch] = useState("");
     const dialogTitleRef = useRef("");
     const dialogInputDefaultValue = useRef<string>("");
 
@@ -127,18 +128,32 @@ export default function NotesLayout({ children }: { children: React.ReactNode })
                     <Sidebar collapsible="none" className="h-screen">
                         <SidebarContent>
                             <SidebarGroup>
-                                <SidebarGroupLabel className="justify-between">
-                                    <Label>Notas</Label>
-                                    <div className="flex gap-3">
-                                        <FilePlus2
-                                            width={15}
-                                            className="opacity-50 hover:opacity-85 hover:cursor-pointer"
-                                            onClick={handleCreateNote}
+                                <SidebarGroupLabel className="flex-col h-fit">
+                                    <div className="flex justify-between w-full">
+                                        <Label>Notas</Label>
+                                        <div className="flex gap-3">
+                                            <FilePlus2
+                                                width={15}
+                                                className="opacity-50 hover:opacity-85 hover:cursor-pointer"
+                                                onClick={handleCreateNote}
+                                            />
+                                            <FolderPlus
+                                                width={15}
+                                                className="opacity-50 hover:opacity-85 hover:cursor-pointer"
+                                                onClick={handleCreateFolder}
+                                            />
+                                        </div>
+                                    </div>
+                                    <div className="relative my-5 w-full">
+                                        <Search
+                                            className="absolute right-3 top-1/2 -translate-y-1/2 text-muted"
+                                            size={15}
                                         />
-                                        <FolderPlus
-                                            width={15}
-                                            className="opacity-50 hover:opacity-85 hover:cursor-pointer"
-                                            onClick={handleCreateFolder}
+                                        <Input
+                                            className="!bg-[#ddd] text-muted placeholder:text-muted-foreground focus-visible:ring-0 border-0"
+                                            placeholder="Pesquisar"
+                                            type="text"
+                                            onChange={(e) => setSearch(e.target.value)}
                                         />
                                     </div>
                                 </SidebarGroupLabel>
@@ -147,6 +162,7 @@ export default function NotesLayout({ children }: { children: React.ReactNode })
                                         id={rootID ?? undefined}
                                         openDialogInput={openDialogInput}
                                         ref={rootRef}
+                                        search={search}
                                     />
                                 </SidebarGroupContent>
                             </SidebarGroup>
