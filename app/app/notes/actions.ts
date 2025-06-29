@@ -71,7 +71,10 @@ export async function findChildrenByID(id: string): Promise<FileNode> {
 }
 
 export async function findRoot() {
-    return await fileModel.findOne({ name: "root", type: "folder" }).orFail().catch(async () => await fileModel.create({ name: "root", type: "folder" }))
+    return await fileModel
+        .findOne({ name: "root", type: "folder" })
+        .orFail()
+        .catch(async () => await fileModel.create({ name: "root", type: "folder" }));
 }
 
 function buildFileList(files: IFile[]): FileNode {
@@ -80,17 +83,17 @@ function buildFileList(files: IFile[]): FileNode {
         name: "",
         parent: null,
         type: "folder",
-        children: []
-    }
+        children: [],
+    };
 
     for (const file of files) {
         if (file.type !== "file") continue;
-        
+
         rootNode.children?.push({
             _id: file.id!,
             name: file.name,
             parent: file.parent?.toString(),
-            type: "file"
+            type: "file",
         });
     }
 
@@ -100,7 +103,7 @@ function buildFileList(files: IFile[]): FileNode {
 export async function searchNotes(search: string): Promise<FileNode> {
     await connectToDatabase();
 
-    const data = await fileModel.find({ name: {"$regex": search, "$options": "i"}, type: "file" }).exec();
+    const data = await fileModel.find({ name: { $regex: search, $options: "i" }, type: "file" }).exec();
 
     return buildFileList(data);
 }
@@ -184,6 +187,21 @@ export async function hasNote(id: string): Promise<boolean> {
     return await fileModel
         .findOne({ _id: id, type: "file" })
         .orFail()
+        .then(() => true)
+        .catch(() => false);
+}
+
+export async function moveEntry(entryId: string, folderId: string) {
+    await connectToDatabase();
+
+    const folder = await fileModel.findOne({ _id: folderId, type: "folder" });
+
+    if (!folder) {
+        return false;
+    }
+
+    return await fileModel
+        .updateOne({ _id: entryId }, { parent: folder._id })
         .then(() => true)
         .catch(() => false);
 }
