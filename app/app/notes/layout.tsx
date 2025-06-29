@@ -10,15 +10,66 @@ import {
 } from "@/components/ui/sidebar";
 import Explorer from "./components/explorer";
 import { Dialog, DialogClose, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { useEffect, useRef, useState } from "react";
+import { RefObject, useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { FilePlus2, FolderPlus, Search } from "lucide-react";
-import { createNote, createFolder, getRootID } from "@/app/app/notes/actions";
+import { createNote, createFolder, getRootID, moveEntry } from "@/app/app/notes/actions";
 import { Label } from "@/components/ui/label";
-import { ScrollArea } from "@/components/ui/scroll-area";
+import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { redirect } from "next/navigation";
 import { ExplorerRef } from "@/types/explorer";
+import { DndProvider, useDrop } from "react-dnd";
+import { HTML5Backend } from "react-dnd-html5-backend";
+import { dragType } from "./dragType";
+import { ContextMenu, ContextMenuContent, ContextMenuItem, ContextMenuTrigger } from "@/components/ui/context-menu";
+
+function DndRootComponent(props: {
+    rootId: string;
+    rootRef: RefObject<ExplorerRef | null>;
+    searching: boolean;
+    handleCreateFolder: () => Promise<void>;
+    handleCreateNote: () => Promise<void>;
+}) {
+    const [{ isOver }, drop] = useDrop({
+        accept: dragType,
+        collect(monitor) {
+            return {
+                isOver: monitor.isOver(),
+            };
+        },
+        drop(item) {
+            const { id: fileId, reloadParent } = item as { id: string; reloadParent: () => void };
+
+            moveEntry(fileId, props.rootId).then(() => {
+                reloadParent();
+                props.rootRef.current?.reload();
+            });
+        },
+    });
+
+    return (
+        <>
+            {!props.searching && (
+                <ContextMenu>
+                    <ContextMenuTrigger asChild>
+                        <div ref={drop as any} className="w-full h-full relative pb-10">
+                            {isOver && <div className="absolute left-0 top-0 w-full h-full bg-white/15" />}
+                        </div>
+                    </ContextMenuTrigger>
+                    <ContextMenuContent className="flex min-w-fit">
+                        <ContextMenuItem className="hover:cursor-pointer" onClick={props.handleCreateNote}>
+                            <FilePlus2 width={15} className="opacity-50 hover:opacity-85 hover:cursor-pointer" />
+                        </ContextMenuItem>
+                        <ContextMenuItem className="hover:cursor-pointer" onClick={props.handleCreateFolder}>
+                            <FolderPlus width={15} className="opacity-50 hover:opacity-85 hover:cursor-pointer" />
+                        </ContextMenuItem>
+                    </ContextMenuContent>
+                </ContextMenu>
+            )}
+        </>
+    );
+}
 
 export default function NotesLayout({ children }: { children: React.ReactNode }) {
     const inputRef = useRef<HTMLInputElement>(null);
@@ -124,49 +175,63 @@ export default function NotesLayout({ children }: { children: React.ReactNode })
                 </DialogContent>
             </Dialog>
             <div className="flex justify-start">
-                <SidebarProvider className="w-fit">
-                    <Sidebar collapsible="none" className="h-screen">
-                        <SidebarContent>
-                            <SidebarGroup>
-                                <SidebarGroupLabel className="flex-col h-fit">
-                                    <div className="flex justify-between w-full">
-                                        <Label>Notas</Label>
-                                        <div className="flex gap-3">
-                                            <FilePlus2
-                                                width={15}
-                                                className="opacity-50 hover:opacity-85 hover:cursor-pointer"
-                                                onClick={handleCreateNote}
-                                            />
-                                            <FolderPlus
-                                                width={15}
-                                                className="opacity-50 hover:opacity-85 hover:cursor-pointer"
-                                                onClick={handleCreateFolder}
-                                            />
-                                        </div>
-                                    </div>
-                                    <div className="relative my-5 w-full">
-                                        <Search
-                                            className="absolute right-3 top-1/2 -translate-y-1/2 text-muted"
-                                            size={15}
-                                        />
-                                        <Input
-                                            className="!bg-[#ddd] text-muted placeholder:text-muted-foreground focus-visible:ring-0 border-0"
-                                            placeholder="Pesquisar"
-                                            type="text"
-                                            onChange={(e) => setSearch(e.target.value)}
-                                        />
-                                    </div>
-                                </SidebarGroupLabel>
-                                <SidebarGroupContent>
-                                    <Explorer
-                                        id={rootID ?? undefined}
-                                        openDialogInput={openDialogInput}
-                                        ref={rootRef}
-                                        search={search}
-                                    />
-                                </SidebarGroupContent>
-                            </SidebarGroup>
-                        </SidebarContent>
+                <SidebarProvider className="w-fit max-h-screen">
+                    <Sidebar collapsible="none" className="h-screen w-fit">
+                        <DndProvider backend={HTML5Backend}>
+                            <SidebarContent className="w-[320px] max-w-[320px] relative">
+                                <ScrollArea className="h-screen">
+                                    <SidebarGroup className="h-screen">
+                                        <SidebarGroupLabel className="flex-col h-fit">
+                                            <div className="flex justify-between w-full">
+                                                <Label>Notas</Label>
+                                                <div className="flex gap-3">
+                                                    <FilePlus2
+                                                        width={15}
+                                                        className="opacity-50 hover:opacity-85 hover:cursor-pointer"
+                                                        onClick={handleCreateNote}
+                                                    />
+                                                    <FolderPlus
+                                                        width={15}
+                                                        className="opacity-50 hover:opacity-85 hover:cursor-pointer"
+                                                        onClick={handleCreateFolder}
+                                                    />
+                                                </div>
+                                            </div>
+                                            <div className="relative my-5 w-full">
+                                                <Search
+                                                    className="absolute right-3 top-1/2 -translate-y-1/2 text-muted"
+                                                    size={15}
+                                                />
+                                                <Input
+                                                    className="!bg-[#ddd] text-muted placeholder:text-muted-foreground focus-visible:ring-0 border-0"
+                                                    placeholder="Pesquisar"
+                                                    type="text"
+                                                    onChange={(e) => setSearch(e.target.value)}
+                                                />
+                                            </div>
+                                        </SidebarGroupLabel>
+                                        <ScrollArea>
+                                            <ScrollBar orientation="horizontal" />
+                                            <SidebarGroupContent>
+                                                <Explorer
+                                                    id={rootID ?? undefined}
+                                                    openDialogInput={openDialogInput}
+                                                    ref={rootRef}
+                                                    search={search}
+                                                />
+                                                <DndRootComponent
+                                                    rootRef={rootRef}
+                                                    rootId={rootID}
+                                                    searching={!!search}
+                                                    handleCreateFolder={handleCreateFolder}
+                                                    handleCreateNote={handleCreateNote}
+                                                />
+                                            </SidebarGroupContent>
+                                        </ScrollArea>
+                                    </SidebarGroup>
+                                </ScrollArea>
+                            </SidebarContent>
+                        </DndProvider>
                     </Sidebar>
                 </SidebarProvider>
                 <ScrollArea className="max-h-screen w-full">
