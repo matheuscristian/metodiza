@@ -1,11 +1,11 @@
 "use client";
 
-import { findChildrenByID } from "@/app/app/notes/actions";
+import { findChildrenByID, moveEntry, searchNotes } from "@/app/app/notes/actions";
+import useFolder from "@/app/app/notes/hooks/use-folder";
+import useNote from "@/app/app/notes/hooks/use-note";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { ContextMenu, ContextMenuContent, ContextMenuItem, ContextMenuTrigger } from "@/components/ui/context-menu";
 import { SidebarMenu, SidebarMenuButton, SidebarMenuSub } from "@/components/ui/sidebar";
-import useFolder from "@/app/app/notes/hooks/use-folder";
-import useNote from "@/app/app/notes/hooks/use-note";
 import { cn } from "@/lib/utils";
 import { ExplorerRef } from "@/types/explorer";
 import { FileNode } from "@/types/file";
@@ -13,15 +13,96 @@ import { ChevronRight, File, FilePlus2, FolderPlus, SquarePen, Trash2 } from "lu
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import React, { useCallback, useEffect, useImperativeHandle, useRef, useState } from "react";
+import { useDrag, useDrop } from "react-dnd";
+import { dragType } from "../dragType";
 
 const treeCache = new Map<string, FileNode>();
 
+function FolderComponent(props: {
+    name: string;
+    id: string;
+    setFolderOpenstate: React.Dispatch<React.SetStateAction<Record<string, boolean>>>;
+    reloadTree: () => void;
+    ref: React.RefObject<ExplorerRef | null>;
+}) {
+    const [{ isOver, canDrop }, drop] = useDrop({
+        accept: dragType,
+        collect(monitor) {
+            return {
+                isOver: monitor.isOver(),
+                canDrop: monitor.canDrop(),
+            };
+        },
+        drop(item) {
+            const { id: fileId, reloadParent } = item as { id: string; reloadParent: () => void };
+
+            moveEntry(fileId, props.id).then(() => {
+                props.setFolderOpenstate((prev) => ({ ...prev, [props.id]: true }));
+
+                props.ref.current?.reload();
+
+                if (props.reloadTree == reloadParent) {
+                    reloadParent();
+                } else {
+                    reloadParent();
+                    props.reloadTree();
+                }
+            });
+        },
+        canDrop(item) {
+            return ((item as { id: string }).id as string) !== props.id;
+        },
+    });
+
+    const [, drag] = useDrag(
+        {
+            type: dragType,
+            item: { id: props.id, reloadParent: props.reloadTree },
+        },
+        [props.id]
+    );
+
+    return (
+        <div ref={drag as any} className="size-full">
+            <div ref={drop as any} className="flex items-center justify-start gap-1 size-full">
+                <ChevronRight
+                    className="transition-transform group-data-[state=open]/collapsible:rotate-90"
+                    size={16.5}
+                />{" "}
+                {props.name}
+                {isOver && canDrop && <div className="absolute h-full w-full bg-white/10 left-0 rounded-md" />}
+            </div>
+        </div>
+    );
+}
+
+function FileComponent(props: { f: { _id: string; name: string }; pathNoteID: string; reloadTree: () => void }) {
+    const [, drag] = useDrag(
+        {
+            type: dragType,
+            item: { id: props.f._id, reloadParent: props.reloadTree },
+        },
+        [props.f._id]
+    );
+
+    return (
+        <SidebarMenuButton
+            ref={drag as any}
+            className={cn("hover:cursor-pointer w-full", props.pathNoteID === props.f._id && "bg-gray-500/15")}
+        >
+            <File /> {props.f.name}
+        </SidebarMenuButton>
+    );
+}
+
 export default function Explorer({
     id,
+    search,
     openDialogInput,
     ref,
 }: {
     id?: string;
+    search?: string;
     openDialogInput: (title: string, defaultValue?: string) => Promise<string | null>;
     ref?: React.RefObject<ExplorerRef | null>;
 }) {
@@ -38,15 +119,21 @@ export default function Explorer({
     const reloadTree = useCallback(() => {
         if (!id) throw new Error("ID is needed to build tree");
 
-        findChildrenByID(id).then((data) => {
-            treeCache.set(id, data);
-            setFileTree(data);
-        });
-    }, [id]);
+        if (!search) {
+            findChildrenByID(id).then((data) => {
+                treeCache.set(id, data);
+                setFileTree(data);
+            });
+        } else {
+            searchNotes(search).then((data) => {
+                setFileTree(data);
+            });
+        }
+    }, [id, search]);
 
     useEffect(() => {
         reloadTree();
-    }, [id, reloadTree]);
+    }, [id, search, reloadTree]);
 
     useImperativeHandle(ref, () => ({ reload: reloadTree }), [reloadTree]);
 
@@ -78,11 +165,7 @@ export default function Explorer({
                         <ContextMenu key={f._id}>
                             <ContextMenuTrigger asChild>
                                 <Link href={`/app/notes/${f._id}?name=${f.name}`}>
-                                    <SidebarMenuButton
-                                        className={cn("hover:cursor-pointer", pathNoteID === f._id && "bg-gray-500/15")}
-                                    >
-                                        <File /> {f.name}
-                                    </SidebarMenuButton>
+                                    <FileComponent pathNoteID={pathNoteID} f={f} reloadTree={reloadTree} />
                                 </Link>
                             </ContextMenuTrigger>
                             <ContextMenuContent className="flex min-w-fit">
@@ -111,10 +194,15 @@ export default function Explorer({
                     >
                         <ContextMenu>
                             <CollapsibleTrigger asChild>
-                                <ContextMenuTrigger asChild>
-                                    <SidebarMenuButton className="hover:cursor-pointer group/collapsible">
-                                        <ChevronRight className="transition-transform group-data-[state=open]/collapsible:rotate-90" />{" "}
-                                        {f.name}
+                                <ContextMenuTrigger className="w-fit" asChild>
+                                    <SidebarMenuButton className="hover:cursor-pointer group/collapsible relative w-full">
+                                        <FolderComponent
+                                            name={f.name}
+                                            setFolderOpenstate={setFolderOpenState}
+                                            id={f._id}
+                                            reloadTree={reloadTree}
+                                            ref={ref}
+                                        />
                                     </SidebarMenuButton>
                                 </ContextMenuTrigger>
                             </CollapsibleTrigger>
@@ -138,7 +226,7 @@ export default function Explorer({
                         </ContextMenu>
 
                         <CollapsibleContent>
-                            <SidebarMenuSub className="mr-0 pr-0 min-w-[220px]">
+                            <SidebarMenuSub className="mr-0 pr-0 w-full">
                                 <Explorer id={f._id} openDialogInput={openDialogInput} ref={ref} />
                             </SidebarMenuSub>
                         </CollapsibleContent>
