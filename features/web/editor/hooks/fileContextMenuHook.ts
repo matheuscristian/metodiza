@@ -6,9 +6,12 @@ import {
 } from "@/features/web/editor/actions/entryActions";
 import useFolderStore from "@/features/web/editor/stores/folderStore";
 import swalGetValue from "@/features/web/editor/utils/swalGetValue";
+import { redirect, usePathname } from "next/navigation";
 
 export default function useFileContextMenu(id: string, parent: string) {
     const fetchFolder = useFolderStore((s) => s.fetchFolder);
+
+    const pathName = usePathname();
 
     async function handleRenameFile() {
         const { value: name, isConfirmed } =
@@ -27,6 +30,10 @@ export default function useFileContextMenu(id: string, parent: string) {
         await deleteFile(id);
 
         fetchFolder(parent);
+
+        if (pathName.includes(id)) {
+            redirect("/web/editor");
+        }
     }
 
     return [handleRenameFile, handleDeleteFile];

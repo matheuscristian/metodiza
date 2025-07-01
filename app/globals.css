@@ -1,5 +1,7 @@
 @import "tailwindcss";
 
+@plugin "@tailwindcss/typography";
+
 @theme {
     --color-background: #121214;
     --color-surface: #1e1e22;
@@ -12,6 +14,18 @@
     --color-accent-secondary: #ffafcc;
     --color-accent-tertiary: #bdb2ff;
     --color-accent-focus: #94e2d5;
+}
+
+.prose {
+    color: var(--color-text-primary);
+}
+
+.tiptap p.is-editor-empty:first-child::before {
+    color: var(--color-text-muted);
+    content: attr(data-placeholder);
+    float: left;
+    height: 0;
+    pointer-events: none;
 }
 
 .swal2-popup {
