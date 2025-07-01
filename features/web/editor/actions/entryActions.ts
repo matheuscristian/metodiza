@@ -1,9 +1,11 @@
 "use server";
 
+import { getRootId } from "@/features/web/editor/actions/treeActions";
 import db from "@/libs/db";
 
 export async function createEntry(name: string, parent: string, type: string) {
     if (!name) throw new Error("Name is required");
+    if (name === "root") throw new Error("Protected name");
     if (!parent) throw new Error("Parent is required");
     if (!["file", "folder"].includes(type)) throw new Error("Invalid type");
 
@@ -14,6 +16,7 @@ export async function createEntry(name: string, parent: string, type: string) {
 
 export async function renameEntry(id: string, name: string) {
     if (!name) throw new Error("Name is required");
+    if (name === "root") throw new Error("Cannot rename root");
 
     const prisma = db.connect();
 
@@ -42,6 +45,9 @@ export async function deleteFolder(id: string) {
     });
 
     if (!folder) throw new Error("Couldn't find folder");
+
+    if (folder.id === (await getRootId()))
+        throw new Error("Cannot delete root folder");
 
     const children = await prisma.entry.findMany({ where: { parent: id } });
 
