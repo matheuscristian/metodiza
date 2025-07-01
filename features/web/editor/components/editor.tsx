@@ -4,18 +4,19 @@ import {
     getFileContent,
     saveFile,
 } from "@/features/web/editor/actions/editorActions";
+import CustomBubbleMenu from "@/features/web/editor/components/CustomBubbleMenu";
+import Link from "@tiptap/extension-link";
+import Placeholder from "@tiptap/extension-placeholder";
 import TaskItem from "@tiptap/extension-task-item";
 import TaskList from "@tiptap/extension-task-list";
-import Link from "@tiptap/extension-link";
+import Underline from "@tiptap/extension-underline";
 import {
-    Editor as TipTapEditor,
-    EditorProvider,
     BubbleMenu,
+    EditorProvider,
+    Editor as TipTapEditor,
 } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import { useEffect, useRef, useState } from "react";
-import Placeholder from "@tiptap/extension-placeholder";
-import CustomBubbleMenu from "@/features/web/editor/components/CustomBubbleMenu";
 
 const extensions = [
     StarterKit.configure({
@@ -30,6 +31,7 @@ const extensions = [
     Placeholder.configure({
         placeholder: "Começe digitando algo brilhante...",
     }),
+    Underline,
 ];
 
 export default function Editor({ fileId }: { fileId: string }) {
