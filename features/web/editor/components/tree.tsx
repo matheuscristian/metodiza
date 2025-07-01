@@ -26,6 +26,15 @@ export default function Tree() {
             className="h-full w-full relative"
         >
             {root ? <Folder entry={root} root /> : null}
+            {root && (
+                <div
+                    data-entry-id={root.id}
+                    data-entry-type={root.type}
+                    data-entry-parent={root.parent}
+                    data-entry-root
+                    className="w-full h-full"
+                />
+            )}
             <ContextMenu pos={pos} target={target} />
         </div>
     );

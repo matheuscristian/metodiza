@@ -25,7 +25,7 @@ export default function useContextMenu(): [
     }, []);
 
     function show(e: MouseEvent) {
-        setPos({ x: e.pageX, y: e.pageY });
+        setPos({ x: e.clientX, y: e.clientY });
         setTarget(e.target as HTMLElement);
     }
 

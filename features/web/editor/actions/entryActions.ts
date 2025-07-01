@@ -5,6 +5,7 @@ import db from "@/libs/db";
 export async function createEntry(name: string, parent: string, type: string) {
     if (!name) throw new Error("Name is required");
     if (!parent) throw new Error("Parent is required");
+    if (!["file", "folder"].includes(type)) throw new Error("Invalid type");
 
     const prisma = db.connect();
 

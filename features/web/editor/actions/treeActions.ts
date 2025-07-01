@@ -10,7 +10,15 @@ export async function getRoot() {
         where: { name: "root", type: "folder", parent: null },
     });
 
-    if (!root) throw new Error("Couldn't find root folder");
+    if (!root)
+        return await prisma.entry.create({
+            data: {
+                name: "root",
+                type: "folder",
+                parent: null,
+                content: null,
+            },
+        });
 
     return root;
 }

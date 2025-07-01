@@ -21,21 +21,21 @@ export default function ContextMenu({
     const id = entryElement.dataset.entryId!;
     const parent = entryElement.dataset.entryParent!;
     const type = entryElement.dataset.entryType!;
+    const root = entryElement.dataset.entryRoot;
 
     return (
         <div
-            className="absolute bg-border rounded-md z-1"
+            className="fixed bg-border rounded-md z-1"
             data-name="context-menu"
             style={{
-                left: pos.x,
                 top: pos.y,
-                transform: "translate(-100%, -100%)",
+                left: pos.x,
             }}
         >
             {type === "file" ? (
                 <FileContextMenu id={id} parent={parent} />
             ) : (
-                <FolderContextMenu id={id} parent={parent} />
+                <FolderContextMenu id={id} parent={parent} root={!!root} />
             )}
         </div>
     );
@@ -56,7 +56,15 @@ function FileContextMenu({ id, parent }: { id: string; parent: string }) {
     );
 }
 
-function FolderContextMenu({ id, parent }: { id: string; parent: string }) {
+function FolderContextMenu({
+    id,
+    parent,
+    root,
+}: {
+    id: string;
+    parent: string;
+    root?: boolean;
+}) {
     const [
         handleCreateFile,
         handleCreateFolder,
@@ -72,12 +80,16 @@ function FolderContextMenu({ id, parent }: { id: string; parent: string }) {
             <div onClick={handleCreateFolder}>
                 <FolderPlus width={15} />
             </div>
-            <div onClick={handleRenameFolder}>
-                <PenSquare width={15} />
-            </div>
-            <div onClick={handleDeleteFolder}>
-                <Trash width={15} />
-            </div>
+            {!root && (
+                <>
+                    <div onClick={handleRenameFolder}>
+                        <PenSquare width={15} />
+                    </div>
+                    <div onClick={handleDeleteFolder}>
+                        <Trash width={15} />
+                    </div>
+                </>
+            )}
         </div>
     );
 }
