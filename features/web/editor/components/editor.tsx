@@ -53,6 +53,9 @@ export default function Editor({ fileId }: { fileId: string }) {
             <EditorProvider
                 content={content}
                 onUpdate={handleUpdate}
+                onCreate={(editor) => {
+                    editor.editor.commands.focus();
+                }}
                 editorContainerProps={{
                     className: "w-full h-screen",
                 }}
