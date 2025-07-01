@@ -11,13 +11,11 @@ import {
     Editor as TipTapEditor,
     EditorProvider,
     BubbleMenu,
-    useCurrentEditor,
 } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import { useEffect, useRef, useState } from "react";
 import Placeholder from "@tiptap/extension-placeholder";
-import { Bold, Italic, Strikethrough } from "lucide-react";
-import cn from "@/libs/utils/cn";
+import CustomBubbleMenu from "@/features/web/editor/components/CustomBubbleMenu";
 
 const extensions = [
     StarterKit.configure({
@@ -72,47 +70,5 @@ export default function Editor({ fileId }: { fileId: string }) {
                 </div>
             </EditorProvider>
         )
-    );
-}
-
-function CustomBubbleMenu() {
-    const editor = useCurrentEditor();
-
-    return (
-        <div className="bg-border rounded-md flex [&>div]:cursor-pointer [&>div]:first:rounded-l-md [&>div]:last:rounded-r-md [&>div]:hover:bg-accent-primary/5 [&>div]:py-2 [&>div]:px-3">
-            <div
-                className={cn(
-                    "p-3",
-                    editor.editor?.isActive("bold") && "!bg-accent-focus/15",
-                )}
-                onClick={() =>
-                    editor.editor?.chain().focus().toggleBold().run()
-                }
-            >
-                <Bold size={12} />
-            </div>
-            <div
-                className={cn(
-                    "p-3",
-                    editor.editor?.isActive("italic") && "!bg-accent-focus/15",
-                )}
-                onClick={() =>
-                    editor.editor?.chain().focus().toggleItalic().run()
-                }
-            >
-                <Italic size={12} />
-            </div>
-            <div
-                className={cn(
-                    "p-3",
-                    editor.editor?.isActive("strike") && "!bg-accent-focus/15",
-                )}
-                onClick={() =>
-                    editor.editor?.chain().focus().toggleStrike().run()
-                }
-            >
-                <Strikethrough size={12} />
-            </div>
-        </div>
     );
 }
