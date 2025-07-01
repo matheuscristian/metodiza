@@ -21,10 +21,7 @@ export default function Tree() {
     }
 
     return (
-        <div
-            onContextMenu={handleContextMenu}
-            className="h-full w-full relative"
-        >
+        <div onContextMenu={handleContextMenu} className="h-full w-full">
             {root ? <Folder entry={root} root /> : null}
             {root && (
                 <div
