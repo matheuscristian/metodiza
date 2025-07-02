@@ -66,6 +66,7 @@ export default function Editor({ fileId }: { fileId: string }) {
                         class: "prose prose-invert prose-sm p-3 focus-visible:outline-0 size-full min-w-full",
                     },
                 }}
+                immediatelyRender={false}
                 extensions={extensions}
             >
                 <div>
