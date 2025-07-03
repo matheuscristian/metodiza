@@ -1,9 +1,7 @@
-"use client";
-
 import { entry } from "@/libs/db/prisma";
 import cn from "@/libs/utils/cn";
 import { ChevronRight, File } from "lucide-react";
-import { MouseEvent } from "react";
+import { MouseEvent, Ref } from "react";
 
 export function Entry({
     entry,
@@ -11,11 +9,13 @@ export function Entry({
     isOpen,
     isSelected,
     handleClick,
+    ref,
 }: {
     entry: entry;
     level: number;
     isOpen?: boolean;
     isSelected?: boolean;
+    ref?: Ref<HTMLDivElement>;
     handleClick?: (e: MouseEvent) => void;
 }) {
     return (
@@ -29,6 +29,7 @@ export function Entry({
                 isOpen && "[&_svg]:rotate-90",
                 isSelected && "!bg-accent-primary/5",
             )}
+            ref={ref}
         >
             <EntryPadding px={level * 16} />
             <EntryIcon type={entry.type} isOpen={isOpen} />

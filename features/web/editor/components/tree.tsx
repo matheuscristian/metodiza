@@ -6,6 +6,8 @@ import Folder from "@/features/web/editor/components/folder";
 import useContextMenu from "@/features/web/editor/hooks/contextMenuHook";
 import { entry } from "@/libs/db/prisma";
 import { MouseEvent, useEffect, useState } from "react";
+import { DndProvider } from "react-dnd";
+import { HTML5Backend } from "react-dnd-html5-backend";
 
 export default function Tree() {
     const [root, setRoot] = useState<entry | null>(null);
@@ -22,16 +24,9 @@ export default function Tree() {
 
     return (
         <div onContextMenu={handleContextMenu} className="h-full w-full">
-            {root ? <Folder entry={root} root /> : null}
-            {root && (
-                <div
-                    data-entry-id={root.id}
-                    data-entry-type={root.type}
-                    data-entry-parent={root.parent}
-                    data-entry-root
-                    className="w-full h-full"
-                />
-            )}
+            <DndProvider backend={HTML5Backend}>
+                {root ? <Folder entry={root} root /> : null}
+            </DndProvider>
             <ContextMenu pos={pos} target={target} />
         </div>
     );

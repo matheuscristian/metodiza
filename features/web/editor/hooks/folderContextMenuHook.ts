@@ -6,10 +6,12 @@ import {
     renameEntry,
 } from "@/features/web/editor/actions/entryActions";
 import useFolderStore from "@/features/web/editor/stores/folderStore";
-import swalGetValue from "@/features/web/editor/utils/swalGetValue";
+import { swalGetValue } from "@/features/web/editor/utils/helpers";
 
 export default function useFolderContextMenu(id: string, parent: string) {
     const fetchFolder = useFolderStore((s) => s.fetchFolder);
+
+    const setOpenState = useFolderStore((s) => s.setOpenState);
 
     async function handleCreateFile() {
         const { value: name, isConfirmed } = await swalGetValue("Nova nota");
@@ -21,6 +23,7 @@ export default function useFolderContextMenu(id: string, parent: string) {
         await createEntry(name, id, "file");
 
         fetchFolder(id);
+        setOpenState(id, true);
     }
 
     async function handleCreateFolder() {
@@ -33,6 +36,7 @@ export default function useFolderContextMenu(id: string, parent: string) {
         await createEntry(name, id, "folder");
 
         fetchFolder(id);
+        setOpenState(id, true);
     }
 
     async function handleRenameFolder() {

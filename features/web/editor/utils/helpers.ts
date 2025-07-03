@@ -1,6 +1,10 @@
 import Swal from "sweetalert2";
 
-export default async function swalGetValue(title: string) {
+export const constants = {
+    dragType: "ENTRY",
+};
+
+export async function swalGetValue(title: string) {
     return await Swal.fire<string>({
         title: title,
         input: "text",

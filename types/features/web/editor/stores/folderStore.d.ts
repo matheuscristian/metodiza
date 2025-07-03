@@ -1,8 +1,13 @@
-import { files } from "@/libs/db/prisma";
+import { entry } from "@/libs/db/prisma";
 
 export interface FolderStore {
-    folders: Record<string, files[] | undefined>;
+    folders: Record<string, entry[] | undefined>;
+    fetching: Record<string, boolean>;
+    opened: Record<string, boolean>;
 
-    getFolder(id: string): files[] | undefined;
+    getFolder(id: string): entry[] | undefined;
     fetchFolder(id: string | undefined): Promise<void>;
+
+    getOpenState(id: string): boolean | undefined;
+    setOpenState(id: string, value: boolean): void;
 }
