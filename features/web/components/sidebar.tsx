@@ -23,7 +23,7 @@ export default function SideBar() {
     const pathName = usePathname();
 
     return (
-        <div className="h-screen w-[50px] bg-surface border-r border-border">
+        <div className="h-screen w-[55px] bg-surface border-r border-border">
             <div className="py-3 mb-3">
                 <Link href="/">
                     <Image
