@@ -1,9 +1,15 @@
 import type { Metadata } from "next";
-import "./globals.css";
+import { Inter } from "next/font/google";
+import "@/app/globals.css";
+
+const inter = Inter({
+    subsets: ["latin"],
+    variable: "--font-inter",
+    display: "swap",
+});
 
 export const metadata: Metadata = {
     title: "Metodiza",
-    description: "*Slogan*",
 };
 
 export default function RootLayout({
@@ -12,8 +18,12 @@ export default function RootLayout({
     children: React.ReactNode;
 }>) {
     return (
-        <html lang="pt-BR">
-            <body className="bg-[var(--bg-1)] text-gray-100 dark">{children}</body>
+        <html lang="pt-br">
+            <body
+                className={`${inter.className} bg-background text-text-primary`}
+            >
+                {children}
+            </body>
         </html>
     );
 }

@@ -1,9 +1,0 @@
-@reference "tailwindcss";
-
-.overview-card {
-    @apply grid grid-cols-[auto_1fr] max-w-[280px] gap-4 bg-black/15 p-5 rounded-md select-none transition-transform duration-300 will-change-transform;
-
-    &:hover {
-        @apply scale-105;
-    }
-}
