@@ -118,7 +118,7 @@ const config = {
       "value": "prisma-client-js"
     },
     "output": {
-      "value": "C:\\Users\\Cristian\\Documents\\metodiza-v2\\libs\\db\\prisma",
+      "value": "C:\\Users\\Cristian\\Documents\\metodiza\\libs\\db\\prisma",
       "fromEnvVar": null
     },
     "config": {
@@ -129,15 +129,18 @@ const config = {
         "fromEnvVar": null,
         "value": "windows",
         "native": true
+      },
+      {
+        "fromEnvVar": null,
+        "value": "rhel-openssl-3.0.x"
       }
     ],
     "previewFeatures": [],
-    "sourceFilePath": "C:\\Users\\Cristian\\Documents\\metodiza-v2\\libs\\db\\schema.prisma",
+    "sourceFilePath": "C:\\Users\\Cristian\\Documents\\metodiza\\libs\\db\\schema.prisma",
     "isCustomOutput": true
   },
   "relativeEnvPaths": {
-    "rootEnvPath": "../../../.env",
-    "schemaEnvPath": "../../../.env"
+    "rootEnvPath": null
   },
   "relativePath": "..",
   "clientVersion": "6.10.1",
@@ -155,8 +158,8 @@ const config = {
       }
     }
   },
-  "inlineSchema": "generator client {\n  provider = \"prisma-client-js\"\n  output   = \"./prisma\"\n}\n\ndatasource db {\n  provider = \"mongodb\"\n  url      = env(\"DATABASE_URL\")\n}\n\nmodel entry {\n  id      String  @id @default(auto()) @map(\"_id\") @db.ObjectId\n  content String?\n  name    String\n  parent  String? @db.ObjectId\n  type    String\n}\n",
-  "inlineSchemaHash": "7082c3cc68cf7ff57c4a600f83351405ed472bf48ee88b08853b1f7d435048d2",
+  "inlineSchema": "generator client {\n  provider      = \"prisma-client-js\"\n  output        = \"./prisma\"\n  binaryTargets = [\"native\", \"rhel-openssl-3.0.x\"]\n}\n\ndatasource db {\n  provider = \"mongodb\"\n  url      = env(\"DATABASE_URL\")\n}\n\nmodel entry {\n  id      String  @id @default(auto()) @map(\"_id\") @db.ObjectId\n  content String?\n  name    String\n  parent  String? @db.ObjectId\n  type    String\n}\n",
+  "inlineSchemaHash": "8da1eb3a7aa52c798e6581854af373c6acde9266c73736767dca627ac4a759ec",
   "copyEngine": true
 }
 config.dirname = '/'
