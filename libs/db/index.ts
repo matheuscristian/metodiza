@@ -1,4 +1,4 @@
-import { PrismaClient } from "@/libs/db/prisma";
+import { PrismaClient } from "@/libs/db/prisma/client";
 
 const moduleCache = {
     ORMClient: null as PrismaClient | null,
