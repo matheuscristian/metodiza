@@ -1,6 +1,6 @@
 "use client";
 
-import { entry } from "@/libs/db/prisma/client";
+import { entry } from "@prisma/client";
 import { redirect, usePathname } from "next/navigation";
 
 export default function useFile(entry: entry): [() => void, boolean] {

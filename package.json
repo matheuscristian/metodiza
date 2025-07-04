@@ -4,7 +4,8 @@
     "private": true,
     "scripts": {
         "dev": "next dev --turbopack",
-        "build": "prisma generate && next build",
+        "postinstall": "prisma generate",
+        "build": "next build",
         "start": "next start",
         "lint": "next lint"
     },
@@ -14,12 +15,12 @@
     "dependencies": {
         "next": "15.3.4",
         "react": "^19.0.0",
-        "react-dom": "^19.0.0"
+        "react-dom": "^19.0.0",
+        "@prisma/client": "^6.10.1"
     },
     "devDependencies": {
         "@eslint/eslintrc": "^3",
         "@next/eslint-plugin-next": "^15.3.4",
-        "@prisma/client": "^6.10.1",
         "@tailwindcss/postcss": "^4",
         "@tailwindcss/typography": "^0.5.16",
         "@tiptap/extension-bubble-menu": "^2.23.1",

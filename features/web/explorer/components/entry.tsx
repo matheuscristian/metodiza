@@ -1,4 +1,4 @@
-import { entry } from "@/libs/db/prisma/client";
+import { entry } from "@prisma/client";
 import cn from "@/libs/utils/cn";
 import { ChevronRight, File } from "lucide-react";
 import { MouseEvent, Ref } from "react";
