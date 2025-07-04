@@ -1,4 +1,4 @@
-import Tree from "@/features/web/editor/components/tree";
+import Tree from "@/features/web/explorer/components/tree";
 
 export default function Explorer() {
     return (

@@ -1,6 +1,6 @@
-import useFileContextMenu from "@/features/web/editor/hooks/fileContextMenuHook";
-import useFolderContextMenu from "@/features/web/editor/hooks/folderContextMenuHook";
-import { Position } from "@/types/features/web/editor/hooks/contextMenu";
+import useFileContextMenu from "@/features/web/explorer/hooks/fileContextMenuHook";
+import useFolderContextMenu from "@/features/web/explorer/hooks/folderContextMenuHook";
+import { Position } from "@/types/features/web/explorer/hooks/contextMenu";
 import { FilePlus, FolderPlus, PenSquare, Trash } from "lucide-react";
 
 export default function ContextMenu({

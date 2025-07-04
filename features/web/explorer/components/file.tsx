@@ -1,6 +1,6 @@
-import { Entry } from "@/features/web/editor/components/entry";
-import useEntryDrag from "@/features/web/editor/hooks/entryDragHook";
-import useFile from "@/features/web/editor/hooks/fileHook";
+import { Entry } from "@/features/web/explorer/components/entry";
+import useEntryDrag from "@/features/web/explorer/hooks/entryDragHook";
+import useFile from "@/features/web/explorer/hooks/fileHook";
 import { entry } from "@/libs/db/prisma";
 import { Ref } from "react";
 

@@ -1,6 +1,6 @@
-import { Entry } from "@/features/web/editor/components/entry";
-import File from "@/features/web/editor/components/file";
-import useFolder from "@/features/web/editor/hooks/folderHook";
+import { Entry } from "@/features/web/explorer/components/entry";
+import File from "@/features/web/explorer/components/file";
+import useFolder from "@/features/web/explorer/hooks/folderHook";
 import { entry } from "@/libs/db/prisma";
 import cn from "@/libs/utils/cn";
 import { Ref } from "react";

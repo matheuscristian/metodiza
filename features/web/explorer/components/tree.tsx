@@ -1,9 +1,9 @@
 "use client";
 
-import { getRoot } from "@/features/web/editor/actions/treeActions";
-import ContextMenu from "@/features/web/editor/components/contextMenu";
-import Folder from "@/features/web/editor/components/folder";
-import useContextMenu from "@/features/web/editor/hooks/contextMenuHook";
+import { getRoot } from "@/features/web/explorer/actions/treeActions";
+import ContextMenu from "@/features/web/explorer/components/contextMenu";
+import Folder from "@/features/web/explorer/components/folder";
+import useContextMenu from "@/features/web/explorer/hooks/contextMenuHook";
 import { entry } from "@/libs/db/prisma";
 import { MouseEvent, useEffect, useState } from "react";
 import { DndProvider } from "react-dnd";

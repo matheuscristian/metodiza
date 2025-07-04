@@ -1,8 +1,8 @@
 import {
     getChildrenOf,
     getRootId,
-} from "@/features/web/editor/actions/treeActions";
-import { FolderStore } from "@/types/features/web/editor/stores/folderStore";
+} from "@/features/web/explorer/actions/treeActions";
+import { FolderStore } from "@/types/features/web/explorer/stores/folderStore";
 import { create } from "zustand";
 
 const useFolderStore = create<FolderStore>((set, get) => ({

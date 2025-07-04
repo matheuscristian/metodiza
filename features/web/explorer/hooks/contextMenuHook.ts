@@ -1,6 +1,6 @@
 "use client";
 
-import { Position } from "@/types/features/web/editor/hooks/contextMenu";
+import { Position } from "@/types/features/web/explorer/hooks/contextMenu";
 import { MouseEvent, useEffect, useState } from "react";
 
 export default function useContextMenu(): [

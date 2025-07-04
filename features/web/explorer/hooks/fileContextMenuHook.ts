@@ -3,9 +3,9 @@
 import {
     deleteFile,
     renameEntry,
-} from "@/features/web/editor/actions/entryActions";
-import useFolderStore from "@/features/web/editor/stores/folderStore";
-import { swalGetValue } from "@/features/web/editor/utils/helpers";
+} from "@/features/web/explorer/actions/entryActions";
+import useFolderStore from "@/features/web/explorer/stores/folderStore";
+import { swalGetValue } from "@/features/web/explorer/utils/helpers";
 import { redirect, usePathname } from "next/navigation";
 
 export default function useFileContextMenu(id: string, parent: string) {

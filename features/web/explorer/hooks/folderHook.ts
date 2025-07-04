@@ -1,11 +1,11 @@
 "use client";
 
-import { moveEntry } from "@/features/web/editor/actions/treeActions";
-import useEntryDrag from "@/features/web/editor/hooks/entryDragHook";
-import useFolderStore from "@/features/web/editor/stores/folderStore";
-import { constants } from "@/features/web/editor/utils/helpers";
+import { moveEntry } from "@/features/web/explorer/actions/treeActions";
+import useEntryDrag from "@/features/web/explorer/hooks/entryDragHook";
+import useFolderStore from "@/features/web/explorer/stores/folderStore";
+import { constants } from "@/features/web/explorer/utils/helpers";
 import { entry } from "@/libs/db/prisma";
-import { DnDItemType } from "@/types/features/web/editor/dnd";
+import { DnDItemType } from "@/types/features/web/explorer/dnd";
 import { useEffect } from "react";
 import { useDrop } from "react-dnd";
 

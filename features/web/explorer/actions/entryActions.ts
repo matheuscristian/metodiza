@@ -1,6 +1,6 @@
 "use server";
 
-import { getRootId } from "@/features/web/editor/actions/treeActions";
+import { getRootId } from "@/features/web/explorer/actions/treeActions";
 import db from "@/libs/db";
 
 export async function createEntry(name: string, parent: string, type: string) {

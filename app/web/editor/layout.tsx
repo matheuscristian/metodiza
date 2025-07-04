@@ -1,4 +1,4 @@
-import Explorer from "@/features/web/editor/components/explorer";
+import Explorer from "@/features/web/explorer/components/explorer";
 
 export default function EditorLayout({
     children,
