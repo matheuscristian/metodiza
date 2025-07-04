@@ -4,7 +4,7 @@ import { moveEntry } from "@/features/web/explorer/actions/treeActions";
 import useEntryDrag from "@/features/web/explorer/hooks/entryDragHook";
 import useFolderStore from "@/features/web/explorer/stores/folderStore";
 import { constants } from "@/features/web/explorer/utils/helpers";
-import { entry } from "@/libs/db/prisma";
+import { entry } from "@prisma/client";
 import { DnDItemType } from "@/types/features/web/explorer/dnd";
 import { useEffect } from "react";
 import { useDrop } from "react-dnd";

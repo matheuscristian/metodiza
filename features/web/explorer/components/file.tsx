@@ -1,7 +1,7 @@
 import { Entry } from "@/features/web/explorer/components/entry";
 import useEntryDrag from "@/features/web/explorer/hooks/entryDragHook";
 import useFile from "@/features/web/explorer/hooks/fileHook";
-import { entry } from "@/libs/db/prisma";
+import { entry } from "@prisma/client";
 import { Ref } from "react";
 
 export default function File({

@@ -1,7 +1,7 @@
 "use client";
 
 import { constants } from "@/features/web/explorer/utils/helpers";
-import { entry } from "@/libs/db/prisma";
+import { entry } from "@prisma/client";
 import { DnDItemType } from "@/types/features/web/explorer/dnd";
 import { useDrag } from "react-dnd";
 

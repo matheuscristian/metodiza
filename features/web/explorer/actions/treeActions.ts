@@ -1,7 +1,7 @@
 "use server";
 
 import db from "@/libs/db";
-import { entry } from "@/libs/db/prisma";
+import { entry } from "@prisma/client";
 
 export async function getRoot() {
     const prisma = db.connect();

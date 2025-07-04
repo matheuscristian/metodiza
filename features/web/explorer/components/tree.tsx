@@ -4,7 +4,7 @@ import { getRoot } from "@/features/web/explorer/actions/treeActions";
 import ContextMenu from "@/features/web/explorer/components/contextMenu";
 import Folder from "@/features/web/explorer/components/folder";
 import useContextMenu from "@/features/web/explorer/hooks/contextMenuHook";
-import { entry } from "@/libs/db/prisma";
+import { entry } from "@prisma/client";
 import { MouseEvent, useEffect, useState } from "react";
 import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
