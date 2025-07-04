@@ -1,7 +1,7 @@
 <!-- <p align="center"><font size="10">METODIZA</font></p> -->
 
 <p align="center">
-<img src="public/logo.svg" width="20%" />
+<img src="public/svg/metodiza.svg" width="20%" />
 </p>
 
 <p align="center"> <small><i>Inserir Slogan</i></small> </p>
