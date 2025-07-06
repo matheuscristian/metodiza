@@ -10,10 +10,10 @@
     --color-text-primary: #ededed;
     --color-text-muted: #999999;
 
-    --color-accent-primary: #a2d2ff;
-    --color-accent-secondary: #ffafcc;
-    --color-accent-tertiary: #bdb2ff;
-    --color-accent-focus: #94e2d5;
+    --color-accent-primary: #3bc9d9;
+    --color-accent-secondary: #d93b84;
+    --color-accent-tertiary: #695173;
+    --color-accent-focus: #37bbca;
 }
 
 .prose {
