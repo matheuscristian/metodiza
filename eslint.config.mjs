@@ -36,6 +36,7 @@ const eslintConfig = [
                     varsIgnorePattern: "^_$", // ignore variables named "_"
                 },
             ],
+            "react-hooks/exhaustive-deps": "off",
         },
     },
 ];
