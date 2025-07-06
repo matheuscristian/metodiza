@@ -40,7 +40,9 @@ export default function useFolder(
     const [_, drag] = useEntryDrag(entry);
 
     useEffect(() => {
-        fetchFolder(entry.id);
+        if (!children) {
+            fetchFolder(entry.id);
+        }
     }, [entry, fetchFolder]);
 
     function handleClick() {

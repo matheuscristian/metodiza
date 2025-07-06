@@ -87,3 +87,14 @@ export async function isChildrenOf(
         }
     });
 }
+
+export async function searchFiles(search: string) {
+    const prisma = db.connect();
+
+    return await prisma.entry.findMany({
+        where: {
+            name: { contains: search, mode: "insensitive" },
+            type: "file",
+        },
+    });
+}

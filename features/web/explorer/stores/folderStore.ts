@@ -14,6 +14,10 @@ const useFolderStore = create<FolderStore>((set, get) => ({
         return get().folders[id];
     },
 
+    getFolders() {
+        return get().folders;
+    },
+
     async fetchFolder(id) {
         if (!id) {
             id = await getRootId();

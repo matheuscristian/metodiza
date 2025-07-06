@@ -6,6 +6,7 @@ export interface FolderStore {
     opened: Record<string, boolean>;
 
     getFolder(id: string): entry[] | undefined;
+    getFolders(): Record<string, entry[] | undefined>;
     fetchFolder(id: string | undefined): Promise<void>;
 
     getOpenState(id: string): boolean | undefined;
