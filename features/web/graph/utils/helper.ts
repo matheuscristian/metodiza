@@ -15,7 +15,7 @@ export function createAlternatingStepper(height: number) {
 }
 
 export function createCircleStepper(gap: number, totalPoints: number) {
-    const circumference = gap * gap;
+    const circumference = gap * totalPoints;
     const radius = circumference / (2 * Math.PI);
 
     let index = 0;
