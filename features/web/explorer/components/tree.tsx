@@ -1,29 +1,29 @@
 "use client";
 
 import { getRoot } from "@/features/web/explorer/actions/treeActions";
-import ContextMenu from "@/features/web/explorer/components/contextMenu";
+import FileContextMenu from "@/features/web/explorer/components/fileContextMenu";
 import FileList from "@/features/web/explorer/components/fileList";
 import Folder from "@/features/web/explorer/components/folder";
-import useContextMenu from "@/features/web/explorer/hooks/contextMenuHook";
+import FolderContextMenu from "@/features/web/explorer/components/folderContextMenu";
+import useContextMenuStore from "@/libs/contextMenu/stores/contextMenuStore";
 import { entry } from "@prisma/client";
 import { Search } from "lucide-react";
-import { MouseEvent, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
 
 export default function Tree() {
     const [root, setRoot] = useState<entry | null>(null);
-    const [pos, target, show] = useContextMenu();
     const [search, setSearch] = useState("");
+
+    const registerContextMenu = useContextMenuStore((s) => s.register);
 
     useEffect(() => {
         getRoot().then((res) => setRoot(res));
-    }, []);
 
-    function handleContextMenu(e: MouseEvent) {
-        e.preventDefault();
-        show(e);
-    }
+        registerContextMenu("file", FileContextMenu);
+        registerContextMenu("folder", FolderContextMenu);
+    }, []);
 
     return (
         <div className="size-full flex flex-col items-center gap-3">
@@ -44,9 +44,8 @@ export default function Tree() {
                 />
             </div>
             <DndProvider backend={HTML5Backend}>
-                <div onContextMenu={handleContextMenu} className="size-full">
+                <div className="size-full">
                     <RenderEntries root={root} search={search} />
-                    <ContextMenu pos={pos} target={target} />
                 </div>
             </DndProvider>
         </div>

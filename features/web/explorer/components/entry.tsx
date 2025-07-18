@@ -21,6 +21,7 @@ export function Entry({
     return (
         <div
             onClick={handleClick}
+            data-context-menu-name={entry.type}
             data-entry-id={entry.id}
             data-entry-type={entry.type}
             data-entry-parent={entry.parent}
