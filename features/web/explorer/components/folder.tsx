@@ -65,6 +65,7 @@ function RenderRoot({
         <>
             {renderChildren(entryChildren, level)}
             <div
+                data-context-menu-name="folder"
                 data-entry-id={entry.id}
                 data-entry-type={entry.type}
                 data-entry-parent={entry.parent}

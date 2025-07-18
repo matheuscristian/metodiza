@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "@/app/globals.css";
+import ContextMenuProvider from "@/libs/contextMenu/components/contextMenuProvider";
 
 const inter = Inter({
     subsets: ["latin"],
@@ -23,6 +24,7 @@ export default function RootLayout({
                 className={`${inter.className} bg-background text-text-primary`}
             >
                 {children}
+                <ContextMenuProvider />
             </body>
         </html>
     );
