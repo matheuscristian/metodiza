@@ -33,18 +33,19 @@ export default function Folder({
     }
 
     return (
-        <div ref={drag as Ref<HTMLDivElement>}>
-            <Entry
-                entry={entry}
-                level={currentLevel}
-                isOpen={isOpen}
-                isSelected={canDrop}
-                ref={drop as Ref<HTMLDivElement>}
-                handleClick={handleClick}
-            />
-
+        <>
+            <div ref={drag as Ref<HTMLDivElement>}>
+                <Entry
+                    entry={entry}
+                    level={currentLevel}
+                    isOpen={isOpen}
+                    isSelected={canDrop}
+                    ref={drop as Ref<HTMLDivElement>}
+                    handleClick={handleClick}
+                />
+            </div>
             {isOpen && renderChildren(children, currentLevel)}
-        </div>
+        </>
     );
 }
 
