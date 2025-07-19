@@ -22,7 +22,7 @@ export default function Folder({
 
     if (root) {
         return (
-            <RenderRoot
+            <Root
                 entry={entry}
                 entryChildren={children}
                 level={currentLevel}
@@ -48,7 +48,7 @@ export default function Folder({
     );
 }
 
-function RenderRoot({
+function Root({
     entry,
     entryChildren,
     level,
