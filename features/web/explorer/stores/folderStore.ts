@@ -14,6 +14,25 @@ const useFolderStore = create<FolderStore>((set, get) => ({
         return get().folders[id];
     },
 
+    getFolders() {
+        return get().folders;
+    },
+
+    isChildren(id, parent) {
+        const folders = get().folders;
+        const parentFolder = folders[parent];
+
+        if (!parentFolder) return false;
+
+        for (const entry of parentFolder) {
+            if (entry.id === id) return true;
+
+            if (entry.type === "folder") return this.isChildren(id, entry.id);
+        }
+
+        return false;
+    },
+
     async fetchFolder(id) {
         if (!id) {
             id = await getRootId();

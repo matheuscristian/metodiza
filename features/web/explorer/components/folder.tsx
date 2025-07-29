@@ -22,7 +22,7 @@ export default function Folder({
 
     if (root) {
         return (
-            <RenderRoot
+            <Root
                 entry={entry}
                 entryChildren={children}
                 level={currentLevel}
@@ -33,22 +33,23 @@ export default function Folder({
     }
 
     return (
-        <div ref={drag as Ref<HTMLDivElement>}>
-            <Entry
-                entry={entry}
-                level={currentLevel}
-                isOpen={isOpen}
-                isSelected={canDrop}
-                ref={drop as Ref<HTMLDivElement>}
-                handleClick={handleClick}
-            />
-
+        <>
+            <div ref={drag as Ref<HTMLDivElement>}>
+                <Entry
+                    entry={entry}
+                    level={currentLevel}
+                    isOpen={isOpen}
+                    isSelected={canDrop}
+                    ref={drop as Ref<HTMLDivElement>}
+                    handleClick={handleClick}
+                />
+            </div>
             {isOpen && renderChildren(children, currentLevel)}
-        </div>
+        </>
     );
 }
 
-function RenderRoot({
+function Root({
     entry,
     entryChildren,
     level,
@@ -65,6 +66,7 @@ function RenderRoot({
         <>
             {renderChildren(entryChildren, level)}
             <div
+                data-context-menu-name="folder"
                 data-entry-id={entry.id}
                 data-entry-type={entry.type}
                 data-entry-parent={entry.parent}

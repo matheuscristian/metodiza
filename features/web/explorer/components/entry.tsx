@@ -21,12 +21,12 @@ export function Entry({
     return (
         <div
             onClick={handleClick}
+            data-context-menu-name={entry.type}
             data-entry-id={entry.id}
             data-entry-type={entry.type}
             data-entry-parent={entry.parent}
             className={cn(
                 "w-full flex items-center select-none px-3 py-1 cursor-pointer hover:bg-accent-primary/5 [&_svg]:transition-transform [&_svg]:duration-100",
-                isOpen && "[&_svg]:rotate-90",
                 isSelected && "!bg-accent-primary/5",
             )}
             ref={ref}
@@ -38,13 +38,18 @@ export function Entry({
     );
 }
 
-function EntryIcon({ type }: { type: string; isOpen?: boolean }) {
+function EntryIcon({ type, isOpen }: { type: string; isOpen?: boolean }) {
     const iconSize = 14;
 
     if (type === "file") {
         return <File size={iconSize} />;
     } else {
-        return <ChevronRight size={iconSize} />;
+        return (
+            <ChevronRight
+                size={iconSize}
+                className={cn(isOpen && "rotate-90")}
+            />
+        );
     }
 }
 

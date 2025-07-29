@@ -59,31 +59,13 @@ export async function moveEntry(id: string, dest: string) {
     await prisma.entry.update({ where: { id }, data: { parent: dest } });
 }
 
-export async function isChildrenOf(
-    id: string,
-    parent: string,
-): Promise<boolean> {
+export async function searchFiles(search: string) {
     const prisma = db.connect();
 
-    const entry = await prisma.entry.findUnique({
-        where: { id },
-    });
-
-    if (!entry) throw new Error("Couldn't find any entry with ID");
-
-    const parentFolder = await prisma.entry.findUnique({
-        where: { id: parent, type: "folder" },
-    });
-
-    if (!parentFolder) throw new Error("Couldn't find any folder with ID");
-
-    const parentChildren = await prisma.entry.findMany({ where: { parent } });
-
-    return parentChildren.some((child) => {
-        if (child.id === id) return true;
-
-        if (child.type === "folder") {
-            return isChildrenOf(id, child.id);
-        }
+    return await prisma.entry.findMany({
+        where: {
+            name: { contains: search, mode: "insensitive" },
+            type: "file",
+        },
     });
 }

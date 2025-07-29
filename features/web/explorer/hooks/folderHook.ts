@@ -14,6 +14,7 @@ export default function useFolder(
 ): [() => void, entry[] | undefined, boolean, unknown, boolean, unknown] {
     const children = useFolderStore((s) => s.getFolder(entry.id));
     const fetchFolder = useFolderStore((s) => s.fetchFolder);
+    const isChildren = useFolderStore((s) => s.isChildren);
 
     const isOpen = useFolderStore((s) => s.getOpenState(entry.id)) ?? false;
     const setOpenState = useFolderStore((s) => s.setOpenState);
@@ -22,8 +23,22 @@ export default function useFolder(
         accept: constants.dragType,
         collect(monitor) {
             return {
-                canDrop: monitor.isOver(),
+                canDrop: monitor.canDrop() && monitor.isOver(),
             };
+        },
+        canDrop(item) {
+            const { id, parent } = item as DnDItemType;
+
+            // Cannot drop inside itself
+            if (id === entry.id) return false;
+
+            // Cannot drop inside its parent (already inside)
+            if (parent === entry.id) return false;
+
+            // Cannot drop folder inside its children
+            if (isChildren(entry.id, id)) return false;
+
+            return true;
         },
         drop(item) {
             const { id, parent } = item as DnDItemType;
@@ -40,7 +55,9 @@ export default function useFolder(
     const [_, drag] = useEntryDrag(entry);
 
     useEffect(() => {
-        fetchFolder(entry.id);
+        if (!children) {
+            fetchFolder(entry.id);
+        }
     }, [entry, fetchFolder]);
 
     function handleClick() {
