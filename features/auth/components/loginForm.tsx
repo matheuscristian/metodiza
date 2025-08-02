@@ -78,12 +78,27 @@ export default function LoginForm() {
                     </Link>
                 </div>
             </div>
-            <div className="[&>*]:block">
+            <div className="mb-5 [&>*]:block">
                 <button
                     type="submit"
                     className="bg-accent-secondary outline-accent-tertiary w-full cursor-pointer rounded-sm px-3 py-2 text-sm shadow-sm hover:outline-1 active:brightness-90"
                 >
                     Acessar
+                </button>
+            </div>
+            <div className="mb-5 flex items-center justify-start gap-3">
+                <div className="border-text-muted h-[1px] grow border-b" />
+                <span className="text-text-muted text-sm">
+                    Ainda não tem uma conta?
+                </span>
+                <div className="border-text-muted h-[1px] grow border-b" />
+            </div>
+            <div className="[&>*]:block">
+                <button
+                    onClick={() => redirect("/join")}
+                    className="outline-accent-tertiary border-text-muted text-text-muted hover:text-text-primary w-full cursor-pointer rounded-sm border px-3 py-2 text-sm shadow-sm hover:outline-1 active:brightness-90"
+                >
+                    Cadastro
                 </button>
             </div>
         </form>

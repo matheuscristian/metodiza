@@ -96,14 +96,15 @@ export default function JoinForm() {
                     )}
             </div>
             <div className="mb-5 flex justify-end">
-                <div>
+                <span>
+                    Já tem sua conta?{" "}
                     <Link
                         href="/login"
                         className="text-accent-primary underline"
                     >
-                        Já tem uma conta?
+                        Entrar
                     </Link>
-                </div>
+                </span>
             </div>
             <div className="[&>*]:block">
                 <button
