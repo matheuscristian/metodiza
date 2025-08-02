@@ -73,7 +73,7 @@ function Root({
                 data-entry-root
                 ref={drop as Ref<HTMLDivElement>}
                 className={cn(
-                    "w-full h-full",
+                    "h-full w-full",
                     canDrop && "!bg-accent-primary/5",
                 )}
             />

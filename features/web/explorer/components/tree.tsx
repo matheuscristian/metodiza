@@ -26,7 +26,7 @@ export default function Tree() {
     }, []);
 
     return (
-        <div className="size-full flex flex-col items-center gap-3">
+        <div className="flex size-full flex-col items-center gap-3">
             <div className="relative w-full px-3">
                 <input
                     type="text"
@@ -35,12 +35,12 @@ export default function Tree() {
                     onKeyDown={(e) =>
                         e.key === "Enter" && setSearch(e.currentTarget.value)
                     }
-                    className="bg-text-primary/80 text-gray-900 outline-white/70 focus:outline-1 rounded-sm w-full text-sm  py-1 px-2"
+                    className="bg-text-primary/80 w-full rounded-sm px-2 py-1 text-sm text-gray-900 outline-white/70 focus:outline-1"
                 />
                 <Search
                     size={14}
                     color="black"
-                    className="absolute right-6 top-1/2 -translate-y-1/2"
+                    className="absolute top-1/2 right-6 -translate-y-1/2"
                 />
             </div>
             <DndProvider backend={HTML5Backend}>

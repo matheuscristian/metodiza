@@ -1,17 +1,19 @@
-import LoginForm from "@/features/auth/components/loginForm";
+import JoinForm from "@/features/auth/components/joinForm";
 import Image from "next/image";
 
-export default function Login() {
+export default function Join() {
     return (
         <div className="flex h-screen w-full items-center justify-center">
             <div className="bg-border flex aspect-[16/9] w-[65%] justify-around rounded-xl shadow-md">
                 <div className="flex grow items-center justify-center">
                     <div className="w-[50%] scale-50 lg:scale-75 2xl:scale-100">
                         <div className="mb-5">
-                            <h1 className="text-2xl font-bold">Entrar</h1>
+                            <h1 className="text-2xl font-bold">
+                                Criar nova conta
+                            </h1>
                         </div>
                         <div className="w-full">
-                            <LoginForm />
+                            <JoinForm />
                         </div>
                     </div>
                 </div>

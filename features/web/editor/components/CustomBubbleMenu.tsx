@@ -15,7 +15,7 @@ export default function CustomBubbleMenu() {
     const editor = useCurrentEditor();
 
     return (
-        <div className="bg-border rounded-md flex items-center justify-center [&>div]:cursor-pointer [&>div]:first:rounded-l-md [&>div]:last:rounded-r-md [&>div]:hover:bg-accent-primary/5 [&>div]:p-2">
+        <div className="bg-border [&>div]:hover:bg-accent-primary/5 flex items-center justify-center rounded-md [&>div]:cursor-pointer [&>div]:p-2 [&>div]:first:rounded-l-md [&>div]:last:rounded-r-md">
             <div
                 className={cn(
                     "p-3",

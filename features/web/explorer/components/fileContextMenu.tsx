@@ -16,7 +16,7 @@ export default function FileContextMenu() {
     if (!dataset) return <span>Unable to load context menu</span>;
 
     return (
-        <div className="flex [&>div]:cursor-pointer [&>div]:rounded-md [&>div]:hover:bg-accent-primary/5 [&>div]:py-2 [&>div]:px-3">
+        <div className="[&>div]:hover:bg-accent-primary/5 flex [&>div]:cursor-pointer [&>div]:rounded-md [&>div]:px-3 [&>div]:py-2">
             <div onClick={handleRenameFile}>
                 <PenSquare width={15} />
             </div>

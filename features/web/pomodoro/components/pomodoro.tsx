@@ -12,19 +12,18 @@ export default function Page() {
     const [pomodoroTime, setPomodoroTime] = useState(25 * 60); // 25 minutos
     const [shortBreakTime, setShortBreakTime] = useState(10 * 60);
     const [longBreakTime, setLongBreakTime] = useState(15 * 60);
-   // const [tasks, setTasks] = useState<{ name: string; done: number; total: number }[]>([]);
-    const [taskToDelete, setTaskToDelete] = useState< number | null>(null);
-    const [selecionaTarefa, setSelecionaTarefa] = useState <number|null>(null);
-    
+    // const [tasks, setTasks] = useState<{ name: string; done: number; total: number }[]>([]);
+    const [taskToDelete, setTaskToDelete] = useState<number | null>(null);
+    const [selecionaTarefa, setSelecionaTarefa] = useState<number | null>(null);
+
     type Cycle = { duration: number; completedAt: Date };
 
     type Task = {
-    name: string;
-    cycles: Cycle[];
-    total: number;
+        name: string;
+        cycles: Cycle[];
+        total: number;
     };
     const [tasks, setTasks] = useState<Task[]>([]);
-
 
     const getSetting = () => {
         switch (mode) {
@@ -40,62 +39,68 @@ export default function Page() {
     const { duration, color } = getSetting();
 
     return (
-        <div className="w-full mx-auto px-4 overflow-y-auto">
+        <div className="mx-auto w-full overflow-y-auto px-4">
             {/*Tempo dos pomos */}
-            <div className="flex justify-center pt-10 space-x-10">
+            <div className="flex justify-center space-x-10 pt-10">
                 <h1
                     onClick={() => setMode("pomodoro")}
-                    className={`hover:text-cyan-400 cursor-pointer underline underline-offset-7 ${mode === "pomodoro" ? "text-cyan-300" : ""}`}>
+                    className={`cursor-pointer underline underline-offset-7 hover:text-cyan-400 ${mode === "pomodoro" ? "text-cyan-300" : ""}`}
+                >
                     Pomodoro
                 </h1>
                 <h1
                     onClick={() => setMode("short")}
-                    className={`hover:text-cyan-400 cursor-pointer underline underline-offset-7 ${mode === "short" ? "text-cyan-400" : ""}`}>
+                    className={`cursor-pointer underline underline-offset-7 hover:text-cyan-400 ${mode === "short" ? "text-cyan-400" : ""}`}
+                >
                     Pausa curta
                 </h1>
                 <h1
                     onClick={() => setMode("long")}
-                    className={`hover:text-cyan-400 cursor-pointer underline underline-offset-7 ${mode === "long" ? "text-cyan-400" : ""}`}>
+                    className={`cursor-pointer underline underline-offset-7 hover:text-cyan-400 ${mode === "long" ? "text-cyan-400" : ""}`}
+                >
                     Pausa Longa
                 </h1>
             </div>
 
             <Timer
-            key={mode}
-            DURATION={duration}
-            colorClass={color}
-            onComplete={() => {
-                if (mode === "pomodoro" && selecionaTarefa !== null) {
-                const updated = [...tasks];
-                    if (updated[selecionaTarefa].cycles.length < updated[selecionaTarefa].total) {
-                    updated[selecionaTarefa].cycles.push({
-                        duration: pomodoroTime,
-                        completedAt: new Date(),
-                    });
-                    setTasks(updated);
+                key={mode}
+                DURATION={duration}
+                colorClass={color}
+                onComplete={() => {
+                    if (mode === "pomodoro" && selecionaTarefa !== null) {
+                        const updated = [...tasks];
+                        if (
+                            updated[selecionaTarefa].cycles.length <
+                            updated[selecionaTarefa].total
+                        ) {
+                            updated[selecionaTarefa].cycles.push({
+                                duration: pomodoroTime,
+                                completedAt: new Date(),
+                            });
+                            setTasks(updated);
+                        }
                     }
-                }
-            }}
+                }}
             />
 
             {/* Parte pra adiconar tarefas*/}
-            <div className="w-full mt-8 flex flex-col items-center">
-                <div className="flex justify-between items-center w-full max-w-md px-4">
+            <div className="mt-8 flex w-full flex-col items-center">
+                <div className="flex w-full max-w-md items-center justify-between px-4">
                     <h1>TAREFAS</h1>
-                    <Image 
-                        src="/svg/editarPomodoro.svg" 
-                        alt="Ícone" 
-                        width={20} 
-                        height={20} 
+                    <Image
+                        src="/svg/editarPomodoro.svg"
+                        alt="Ícone"
+                        width={20}
+                        height={20}
                         className="cursor-pointer"
                         onClick={() => setShowTaskModal(true)}
-                        title="Adicionar tarefas" 
+                        title="Adicionar tarefas"
                     />
                 </div>
-                <hr className="border-t border-cyan-400 w-full max-w-lg mt-2" />
+                <hr className="mt-2 w-full max-w-lg border-t border-cyan-400" />
             </div>
-            <Task 
-                isOpen={showTaskModal} 
+            <Task
+                isOpen={showTaskModal}
                 onClose={() => setShowTaskModal(false)}
                 pomodoro={pomodoroTime / 60}
                 short={shortBreakTime / 60}
@@ -107,92 +112,119 @@ export default function Page() {
                 setTasks={setTasks}
             />
 
-            <div className="w-full flex flex-col items-center mt-4">
-           {tasks.map((task, index) => (
-            <TaskItem
-                key={index}
-                name={task.name}
-                cycles={task.cycles}
-                total={task.total}
-                onIncrement={() => {
-                const updated = [...tasks];
-                if (updated[index].cycles.length < updated[index].total) {
-                    updated[index].cycles.push({
-                    duration: pomodoroTime,
-                    completedAt: new Date(),
-                    });
-                    setTasks(updated);
-                }
-                }}
-                onDelete={() => setTaskToDelete(index)}
-                onEdit={({ name, total }) => {
-                const updated = [...tasks];
-                updated[index] = { ...updated[index], name, total };
-                setTasks(updated);
-                }}
-                onSelect={() => setSelecionaTarefa(index)}
-                isSelected={selecionaTarefa === index}
-            />
-            ))}
-
-            {/**Resumo dos tempos */}
-            <section className="mt-10">
-                <ResumoFinal tasks={tasks} tempoPomodoro={pomodoroTime} />
-            </section>
-
-            {/*Pra confirmar o delete */}
-            {taskToDelete !== null && (
-                <div className="fixed inset-0 flex items-center justify-center z-50">
-                    <div className="bg-[#1f2127] p-6 rounded-xl shadow-xl w-full max-w-xs text-center">
-                        <h2 className="text-lg font-bold text-white mb-4">
-                        Tem certeza que deseja apagar <span className="text-cyan-300">"{tasks[taskToDelete!]?.name}"</span>?
-                        </h2>
-                        <div className="flex justify-center space-x-4">
-                            <button className="bg-cyan-500 hover:bg-cyan-600 text-black px-4 py-2 rounded" 
-                            onClick={() => setTaskToDelete(null)}>
-                            Cancelar </button>
-                            <button className="bg-red-500 hover:bg-red-600 text-white px-5 py-2 rounded"
-                            onClick={() => {
-                                const updated = tasks.filter((_, i) => i !== taskToDelete);
+            <div className="mt-4 flex w-full flex-col items-center">
+                {tasks.map((task, index) => (
+                    <TaskItem
+                        key={index}
+                        name={task.name}
+                        cycles={task.cycles}
+                        total={task.total}
+                        onIncrement={() => {
+                            const updated = [...tasks];
+                            if (
+                                updated[index].cycles.length <
+                                updated[index].total
+                            ) {
+                                updated[index].cycles.push({
+                                    duration: pomodoroTime,
+                                    completedAt: new Date(),
+                                });
                                 setTasks(updated);
-                                setTaskToDelete(null);
-                            }}
-                            > Apagar </button>
+                            }
+                        }}
+                        onDelete={() => setTaskToDelete(index)}
+                        onEdit={({ name, total }) => {
+                            const updated = [...tasks];
+                            updated[index] = { ...updated[index], name, total };
+                            setTasks(updated);
+                        }}
+                        onSelect={() => setSelecionaTarefa(index)}
+                        isSelected={selecionaTarefa === index}
+                    />
+                ))}
+
+                {/**Resumo dos tempos */}
+                <section className="mt-10">
+                    <ResumoFinal tasks={tasks} tempoPomodoro={pomodoroTime} />
+                </section>
+
+                {/*Pra confirmar o delete */}
+                {taskToDelete !== null && (
+                    <div className="fixed inset-0 z-50 flex items-center justify-center">
+                        <div className="w-full max-w-xs rounded-xl bg-[#1f2127] p-6 text-center shadow-xl">
+                            <h2 className="mb-4 text-lg font-bold text-white">
+                                Tem certeza que deseja apagar{" "}
+                                <span className="text-cyan-300">
+                                    "{tasks[taskToDelete!]?.name}"
+                                </span>
+                                ?
+                            </h2>
+                            <div className="flex justify-center space-x-4">
+                                <button
+                                    className="rounded bg-cyan-500 px-4 py-2 text-black hover:bg-cyan-600"
+                                    onClick={() => setTaskToDelete(null)}
+                                >
+                                    Cancelar{" "}
+                                </button>
+                                <button
+                                    className="rounded bg-red-500 px-5 py-2 text-white hover:bg-red-600"
+                                    onClick={() => {
+                                        const updated = tasks.filter(
+                                            (_, i) => i !== taskToDelete,
+                                        );
+                                        setTasks(updated);
+                                        setTaskToDelete(null);
+                                    }}
+                                >
+                                    {" "}
+                                    Apagar{" "}
+                                </button>
+                            </div>
                         </div>
                     </div>
-                </div>
-            )}
+                )}
             </div>
 
             <section className="mt-16 w-full bg-[#37373A] px-6 py-10">
-            <div className="max-w-4xl mx-auto">
-                <h2 className="text-xl sm:text-2xl text-center mb-6">
-                Aumente sua Produtividade com a Técnica Pomodoro
-                </h2>
-                <p className="text-justify mb-4 text-sm sm:text-base">
-                A Técnica Pomodoro é uma estratégia simples para melhorar seu foco e sua produtividade. Ela divide seu tempo em blocos de trabalho focado, intercalados com pequenos pausas, ajudando você a manter a concentração por mais tempo.
-                </p>
-                <p className="text-justify mb-4 text-sm sm:text-base">
-                Nosso cérebro tem um limite natural de atenção; em média, conseguimos focar plenamente por cerca de 20 minutos. Ao repetir esse ciclo, fica muito mais fácil se concentrar, ser produtivo e evitar o cansaço mental.
-                </p>
-                <div className="text-justify mb-4 text-sm sm:text-base">
-                <p className="font-semibold">Como usar:</p>
-                <ol className="list-decimal list-inside mt-2 space-y-1">
-                    <li>Liste suas tarefas.</li>
-                    <li>Defina quantos pomodoros cada uma precisa.</li>
-                    <li>Inicie o cronômetro e foque por 25 minutos.</li>
-                    <li>Faça uma pausa curta e repita.</li>
-                </ol>
+                <div className="mx-auto max-w-4xl">
+                    <h2 className="mb-6 text-center text-xl sm:text-2xl">
+                        Aumente sua Produtividade com a Técnica Pomodoro
+                    </h2>
+                    <p className="mb-4 text-justify text-sm sm:text-base">
+                        A Técnica Pomodoro é uma estratégia simples para
+                        melhorar seu foco e sua produtividade. Ela divide seu
+                        tempo em blocos de trabalho focado, intercalados com
+                        pequenos pausas, ajudando você a manter a concentração
+                        por mais tempo.
+                    </p>
+                    <p className="mb-4 text-justify text-sm sm:text-base">
+                        Nosso cérebro tem um limite natural de atenção; em
+                        média, conseguimos focar plenamente por cerca de 20
+                        minutos. Ao repetir esse ciclo, fica muito mais fácil se
+                        concentrar, ser produtivo e evitar o cansaço mental.
+                    </p>
+                    <div className="mb-4 text-justify text-sm sm:text-base">
+                        <p className="font-semibold">Como usar:</p>
+                        <ol className="mt-2 list-inside list-decimal space-y-1">
+                            <li>Liste suas tarefas.</li>
+                            <li>Defina quantos pomodoros cada uma precisa.</li>
+                            <li>Inicie o cronômetro e foque por 25 minutos.</li>
+                            <li>Faça uma pausa curta e repita.</li>
+                        </ol>
+                    </div>
+                    <p className="text-justify text-sm sm:text-base">
+                        Use o Pomodoro e transforme tempo em produtividade,
+                        melhorando sua concentração, sua organização e seus
+                        resultados.
+                    </p>
                 </div>
-                <p className="text-justify text-sm sm:text-base">
-                Use o Pomodoro e transforme tempo em produtividade, melhorando sua concentração, sua organização e seus resultados.
-                </p>
-            </div>
             </section>
-    </div>
+        </div>
     );
 }
 
-{/**
+{
+    /**
     ?imprimir relatorio?
-*/}
+*/
+}
