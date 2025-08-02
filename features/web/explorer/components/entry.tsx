@@ -26,7 +26,7 @@ export function Entry({
             data-entry-type={entry.type}
             data-entry-parent={entry.parent}
             className={cn(
-                "w-full flex items-center select-none px-3 py-1 cursor-pointer hover:bg-accent-primary/5 [&_svg]:transition-transform [&_svg]:duration-100",
+                "hover:bg-accent-primary/5 flex w-full cursor-pointer items-center px-3 py-1 select-none [&_svg]:transition-transform [&_svg]:duration-100",
                 isSelected && "!bg-accent-primary/5",
             )}
             ref={ref}

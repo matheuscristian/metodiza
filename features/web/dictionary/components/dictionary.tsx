@@ -60,17 +60,17 @@ export default function Dictionary() {
     }
 
     return (
-        <div className="py-20 px-20 size-full h-screen overflow-y-auto">
-            <div className="w-[50%] mx-auto">
-                <h1 className="text-4xl mb-5">Dicionário</h1>
+        <div className="size-full h-screen overflow-y-auto px-20 py-20">
+            <div className="mx-auto w-[50%]">
+                <h1 className="mb-5 text-4xl">Dicionário</h1>
                 <div className="relative w-full">
                     <Search
-                        className="absolute left-2 top-1/2 -translate-y-1/2 text-muted-foreground"
+                        className="text-muted-foreground absolute top-1/2 left-2 -translate-y-1/2"
                         size={18}
                     />
                     {value && (
                         <X
-                            className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground cursor-pointer"
+                            className="text-muted-foreground absolute top-1/2 right-3 -translate-y-1/2 cursor-pointer"
                             size={14}
                             onClick={() => setValue("")}
                         />
@@ -81,7 +81,7 @@ export default function Dictionary() {
                         ref={inputRef}
                         onChange={(e) => setValue(e.target.value)}
                         placeholder="Buscar..."
-                        className="px-9 py-1 w-full bg-transparent border-0 rounded-none focus-visible:ring-0 focus:outline-none border-b border-accent-primary/25 focus:border-accent-focus/75 transition-colors"
+                        className="border-accent-primary/25 focus:border-accent-focus/75 w-full rounded-none border-0 border-b bg-transparent px-9 py-1 transition-colors focus:outline-none focus-visible:ring-0"
                     />
                 </div>
                 <div className="mt-4 min-h-[100px] p-4 text-sm whitespace-pre-wrap">
@@ -91,7 +91,7 @@ export default function Dictionary() {
                     {error && <p className="text-red-500">{error}</p>}
                     {content && !loading && (
                         <div
-                            className="text-sm leading-relaxed space-y-3 prose prose-sm prose-invert text-text-primary"
+                            className="prose prose-sm prose-invert text-text-primary space-y-3 text-sm leading-relaxed"
                             dangerouslySetInnerHTML={{ __html: content }}
                         />
                     )}

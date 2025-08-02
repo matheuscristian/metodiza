@@ -9,7 +9,7 @@ export default function ContextMenu() {
     return (
         <div
             data-context-menu
-            className="fixed z-[1000] bg-border rounded-md"
+            className="bg-border fixed z-[1000] rounded-md"
             style={{
                 top: position?.y,
                 left: position?.x,
