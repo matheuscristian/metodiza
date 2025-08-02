@@ -15,3 +15,10 @@ model entry {
   parent  String? @db.ObjectId
   type    String
 }
+
+model user {
+  id       String @id @default(auto()) @map("_id") @db.ObjectId
+  name     String
+  email    String @unique
+  password String
+}
