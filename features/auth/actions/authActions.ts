@@ -38,7 +38,11 @@ export async function register(formData: FormData) {
 
     const data = result.data;
 
-    const createResult = await createUser(data);
+    const createResult = await createUser({
+        name: data.name,
+        email: data.email,
+        password: data.password,
+    });
 
     if (createResult !== true) {
         return {
