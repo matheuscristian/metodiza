@@ -23,7 +23,7 @@ export default function Graph() {
     const [nodes, edges, onNodesChange] = useGraph();
 
     return (
-        <div className="w-full h-screen overflow-hidden">
+        <div className="h-screen w-full overflow-hidden">
             <ReactFlow
                 colorMode="dark"
                 nodes={nodes}
@@ -55,7 +55,7 @@ function NoteNode(node: NodeProps) {
     return (
         <div
             id={`node__${node.id}`}
-            className="note-node rounded-full bg-text-primary size-[30px]"
+            className="note-node bg-text-primary size-[30px] rounded-full"
         >
             <Handle
                 type="source"

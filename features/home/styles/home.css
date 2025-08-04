@@ -1,7 +1,7 @@
 @reference "tailwindcss";
 
 .overview-card {
-    @apply grid grid-cols-[auto_1fr] max-w-[325px] gap-4 bg-[var(--color-border)]/50 shadow-md p-5 items-center outline outline-[var(--color-text-primary)]/50 rounded-md select-none transition-transform duration-300 will-change-transform;
+    @apply grid max-w-[325px] grid-cols-[auto_1fr] items-center gap-4 rounded-md bg-[var(--color-border)]/50 p-5 shadow-md outline outline-[var(--color-text-primary)]/50 transition-transform duration-300 will-change-transform select-none;
 
     &:hover {
         @apply scale-105;

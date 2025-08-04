@@ -6,7 +6,7 @@ export default function EditorLayout({
     children: React.ReactNode;
 }) {
     return (
-        <div className="flex justify-start items-start size-full">
+        <div className="flex size-full items-start justify-start">
             <Explorer />
             {children}
         </div>

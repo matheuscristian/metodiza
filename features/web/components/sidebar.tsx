@@ -23,8 +23,8 @@ export default function SideBar() {
     const pathName = usePathname();
 
     return (
-        <div className="h-screen w-[55px] bg-surface border-r border-border">
-            <div className="py-3 mb-3">
+        <div className="bg-surface border-border h-screen w-[55px] border-r">
+            <div className="mb-3 py-3">
                 <Link href="/">
                     <Image
                         src="/svg/metodiza.svg"
@@ -35,7 +35,7 @@ export default function SideBar() {
                     />
                 </Link>
             </div>
-            <div className="flex flex-col items-center gap-7 [&_svg]:text-text-muted [&_svg]:cursor-pointer [&_svg]:hover:text-text-primary">
+            <div className="[&_svg]:text-text-muted [&_svg]:hover:text-text-primary flex flex-col items-center gap-7 [&_svg]:cursor-pointer">
                 <Link href={navigation.editor}>
                     <File
                         size={iconSize}
