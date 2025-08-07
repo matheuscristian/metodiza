@@ -62,3 +62,7 @@
 .animate-fadeIn {
     animation: fadeIn 0.1s ease-out forwards;
 }
+
+img {
+    @apply select-none;
+}

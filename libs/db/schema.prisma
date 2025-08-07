@@ -14,11 +14,14 @@ model entry {
   name    String
   parent  String? @db.ObjectId
   type    String
+  userId  String  @db.ObjectId
+  user    user    @relation(fields: [userId], references: [id])
 }
 
 model user {
-  id       String @id @default(auto()) @map("_id") @db.ObjectId
+  id       String  @id @default(auto()) @map("_id") @db.ObjectId
   name     String
-  email    String @unique
+  email    String  @unique
   password String
+  entries  entry[]
 }
