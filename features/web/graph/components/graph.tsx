@@ -50,7 +50,7 @@ function NoteNode(node: NodeProps) {
         });
 
         n.current++;
-    }, []);
+    }, [node.data.name, node.id]);
 
     return (
         <div
