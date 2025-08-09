@@ -58,7 +58,7 @@ export default function useFolder(
         if (!children) {
             fetchFolder(entry.id);
         }
-    }, [entry, fetchFolder]);
+    }, [entry, fetchFolder, children]);
 
     function handleClick() {
         setOpenState(entry.id, !isOpen);

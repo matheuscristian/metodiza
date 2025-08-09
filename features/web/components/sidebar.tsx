@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { Book, Calendar, File, Timer, Triangle } from "lucide-react";
+import { AlarmClock, BookA, Calendar, Notebook, Waypoints } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import cn from "@/libs/utils/cn";
@@ -28,11 +28,11 @@ export default function SideBar() {
 
     useEffect(() => {
         registerContextMenu("logo", LogoMenu);
-    }, []);
+    }, [registerContextMenu]);
 
     return (
         <div className="bg-surface border-border h-screen w-[55px] border-r">
-            <div className="mb-3 cursor-pointer py-3 transition-transform will-change-transform backface-hidden transform-3d hover:scale-105">
+            <div className="mb-3 cursor-pointer py-3 transition-transform transform-3d hover:scale-105">
                 <Image
                     src="/svg/metodiza.svg"
                     alt="Logo"
@@ -43,15 +43,15 @@ export default function SideBar() {
                 />
             </div>
             <div className="[&_svg]:text-text-muted [&_svg]:hover:text-text-primary flex flex-col items-center gap-7 [&_svg]:cursor-pointer">
-                <Link href={navigation.editor}>
-                    <File
+                <a href={navigation.editor}>
+                    <Notebook
                         size={iconSize}
                         strokeWidth={iconStrokeWidth}
                         className={checkSelected(pathName, navigation.editor)}
                     />
-                </Link>
+                </a>
                 <Link href={navigation.graph}>
-                    <Triangle
+                    <Waypoints
                         size={iconSize}
                         strokeWidth={iconStrokeWidth}
                         className={checkSelected(pathName, navigation.graph)}
@@ -65,7 +65,7 @@ export default function SideBar() {
                     />
                 </Link>
                 <Link href={navigation.dictionary}>
-                    <Book
+                    <BookA
                         size={iconSize}
                         strokeWidth={iconStrokeWidth}
                         className={checkSelected(
@@ -75,7 +75,7 @@ export default function SideBar() {
                     />
                 </Link>
                 <Link href={navigation.pomodoro}>
-                    <Timer
+                    <AlarmClock
                         size={iconSize}
                         strokeWidth={iconStrokeWidth}
                         className={checkSelected(pathName, navigation.pomodoro)}

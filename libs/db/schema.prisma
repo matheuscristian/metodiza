@@ -24,4 +24,15 @@ model user {
   email    String  @unique
   password String
   entries  entry[]
+  tasks    task[]
+}
+
+model task {
+  id              String  @id @default(auto()) @map("_id") @db.ObjectId
+  name            String  @unique
+  cicles          Int
+  completedCicles Int
+  completed       Boolean
+  userId          String  @db.ObjectId
+  user            user    @relation(fields: [userId], references: [id])
 }
