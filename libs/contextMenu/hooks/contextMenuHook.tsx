@@ -8,6 +8,7 @@ export default function useContextMenu() {
     const setTarget = useContextMenuStore((s) => s.setTarget);
 
     function handleContextMenu(e: MouseEvent) {
+        // Prevents from opening a context menu within a custom context menu
         if ((e.target as HTMLElement).closest("*[data-context-menu]")) {
             e.preventDefault();
         }
@@ -17,17 +18,37 @@ export default function useContextMenu() {
         ) as HTMLElement;
 
         if (!target) {
-            setPosition(null);
-            setTarget(null);
-            setComponent(null);
+            hide();
             return;
         }
 
         e.preventDefault();
 
         setPosition({ x: e.clientX, y: e.clientY });
-        setComponent(target.dataset.contextMenuName ?? null);
         setTarget(target);
+        setComponent(target.dataset.contextMenuName ?? null);
+    }
+
+    function handleMenu(e: MouseEvent) {
+        // Prevents from opening a context menu within a custom context menu
+        if ((e.target as HTMLElement).closest("*[data-context-menu]")) {
+            e.preventDefault();
+        }
+
+        const target = (e.target as HTMLElement).closest(
+            "*[data-menu-name]",
+        ) as HTMLElement;
+
+        if (!target) {
+            hide();
+            return;
+        }
+
+        e.preventDefault();
+
+        setPosition({ x: e.clientX, y: e.clientY });
+        setTarget(target);
+        setComponent(target.dataset.menuName ?? null);
     }
 
     function hide() {
@@ -36,5 +57,5 @@ export default function useContextMenu() {
         setComponent(null);
     }
 
-    return { handleContextMenu, hide };
+    return { handleContextMenu, handleMenu, hide };
 }

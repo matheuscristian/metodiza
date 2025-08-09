@@ -1,6 +1,7 @@
 "use server";
 
 import { getRootId } from "@/features/web/explorer/actions/treeActions";
+import { getVerifiedSession, getUserID } from "@/libs/auth/session";
 import db from "@/libs/db";
 
 export async function createEntry(name: string, parent: string, type: string) {
@@ -9,9 +10,17 @@ export async function createEntry(name: string, parent: string, type: string) {
     if (!parent) throw new Error("Parent is required");
     if (!["file", "folder"].includes(type)) throw new Error("Invalid type");
 
+    const token = await getVerifiedSession();
+    if (!token) throw new Error("User not logged in");
+
+    const userId = await getUserID(token);
+    if (!userId) throw new Error("Invalid token");
+
     const prisma = db.connect();
 
-    await prisma.entry.create({ data: { name, type, parent } });
+    await prisma.entry.create({
+        data: { name, type, parent, user: { connect: { id: userId } } },
+    });
 }
 
 export async function renameEntry(id: string, name: string) {

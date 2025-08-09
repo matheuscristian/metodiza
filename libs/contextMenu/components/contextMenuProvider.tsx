@@ -5,17 +5,17 @@ import useContextMenu from "@/libs/contextMenu/hooks/contextMenuHook";
 import { useEffect } from "react";
 
 export default function ContextMenuProvider() {
-    const { handleContextMenu: handleClick, hide } = useContextMenu();
+    const { handleContextMenu, handleMenu } = useContextMenu();
 
     useEffect(() => {
-        document.addEventListener("contextmenu", handleClick);
-        document.addEventListener("click", hide);
+        document.addEventListener("contextmenu", handleContextMenu);
+        document.addEventListener("click", handleMenu);
 
         return () => {
-            document.removeEventListener("contextmenu", handleClick);
-            document.removeEventListener("click", hide);
+            document.removeEventListener("contextmenu", handleContextMenu);
+            document.removeEventListener("click", handleMenu);
         };
-    }, [handleClick]);
+    }, [handleContextMenu, handleMenu]);
 
     return <ContextMenu />;
 }

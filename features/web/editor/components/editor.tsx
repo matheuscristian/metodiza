@@ -63,7 +63,7 @@ export default function Editor({ fileId }: { fileId: string }) {
                 }}
                 editorProps={{
                     attributes: {
-                        class: "prose prose-invert prose-sm p-3 focus-visible:outline-0 size-full min-w-full",
+                        class: "prose prose-invert prose-p:m-0 prose-sm p-3 focus-visible:outline-0 size-full min-w-full",
                     },
                 }}
                 immediatelyRender={false}

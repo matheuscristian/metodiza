@@ -1,13 +1,25 @@
 "use server";
 
+import { getVerifiedSession, getUserID } from "@/libs/auth/session";
 import db from "@/libs/db";
 import { entry } from "@prisma/client";
 
 export async function getRoot() {
+    const token = await getVerifiedSession();
+    if (!token) throw new Error("User not logged in");
+
+    const userId = await getUserID(token);
+    if (!userId) throw new Error("Invalid session token");
+
     const prisma = db.connect();
 
     const root = await prisma.entry.findFirst({
-        where: { name: "root", type: "folder", parent: null },
+        where: {
+            name: "root",
+            type: "folder",
+            parent: null,
+            user: { id: userId },
+        },
     });
 
     if (!root)
@@ -17,6 +29,7 @@ export async function getRoot() {
                 type: "folder",
                 parent: null,
                 content: null,
+                user: { connect: { id: userId } },
             },
         });
 
