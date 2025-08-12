@@ -3,7 +3,7 @@
 import { getTasks } from "@/features/web/pomodoro/actions/timerActions";
 import useTimerStore from "@/features/web/pomodoro/stores/timerStore";
 import cn from "@/libs/utils/cn";
-import { Trash } from "lucide-react";
+import { CircleCheck, Trash } from "lucide-react";
 import { useEffect } from "react";
 
 function Task({
@@ -11,14 +11,15 @@ function Task({
     completedCicles,
     cicles,
     selected,
+    completed,
 }: {
     name: string;
     completedCicles: number;
     cicles: number;
     selected?: boolean;
+    completed?: boolean;
 }) {
     const selectTask = useTimerStore((s) => s.setSelectedTask);
-    const selectedTask = useTimerStore((s) => s.selectedTask);
     const deleteTask = useTimerStore((s) => s.deleteTask);
 
     return (
@@ -27,7 +28,7 @@ function Task({
                 "bg-border flex cursor-pointer rounded-md brightness-75",
                 selected && "brightness-100",
             )}
-            onClick={() => selectTask(name !== selectedTask ? name : null)}
+            onClick={() => selectTask(!selected ? name : null)}
         >
             <div
                 className={cn(
@@ -36,6 +37,10 @@ function Task({
                 )}
             />
             <div className="flex w-full items-center justify-between p-3">
+                <CircleCheck
+                    size={15}
+                    className={cn("mr-2", completed && "fill-green-700")}
+                />
                 <span className="text-sm">{name}</span>
                 <div className="ml-auto flex items-center justify-between gap-2">
                     <span className="text-text-muted text-sm">
@@ -74,6 +79,7 @@ export default function TaskList() {
                         completedCicles={tasks[taskName].completedCicles}
                         cicles={tasks[taskName].cicles}
                         selected={taskName === selectedTask}
+                        completed={tasks[taskName].completed}
                     />
                 ))}
         </div>

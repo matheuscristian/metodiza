@@ -21,7 +21,7 @@ export default function RootLayout({
     return (
         <html lang="pt-br">
             <body
-                className={`${inter.className} bg-background text-text-primary`}
+                className={`${inter.className} bg-background text-text-primary tabular-nums subpixel-antialiased`}
             >
                 {children}
                 <ContextMenuProvider />
