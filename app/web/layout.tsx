@@ -1,5 +1,5 @@
 import SideBar from "@/features/web/components/sidebar";
-import { cookies } from "next/headers";
+import { getVerifiedSession } from "@/libs/auth/session";
 import { redirect } from "next/navigation";
 
 export default async function WebAppLayout({
@@ -7,10 +7,10 @@ export default async function WebAppLayout({
 }: {
     children: React.ReactNode;
 }) {
-    const token = (await cookies()).get("__session");
+    const token = await getVerifiedSession();
 
     if (!token) {
-        redirect("/join");
+        redirect("/login");
     }
 
     return (

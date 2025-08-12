@@ -23,7 +23,7 @@ export default function Tree() {
 
         registerContextMenu("file", FileContextMenu);
         registerContextMenu("folder", FolderContextMenu);
-    }, []);
+    }, [registerContextMenu]);
 
     return (
         <div className="flex size-full flex-col items-center gap-3">

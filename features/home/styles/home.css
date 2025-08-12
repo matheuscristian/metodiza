@@ -1,9 +1,5 @@
 @reference "tailwindcss";
 
-.overview-card {
-    @apply grid max-w-[325px] grid-cols-[auto_1fr] items-center gap-4 rounded-md bg-[var(--color-border)]/50 p-5 shadow-md outline outline-[var(--color-text-primary)]/50 transition-transform duration-300 will-change-transform select-none;
-
-    &:hover {
-        @apply scale-105;
-    }
+a {
+    @apply select-none;
 }
